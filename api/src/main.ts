@@ -25,7 +25,12 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
     await app.register(fastifyCookie as any, {
-    secret: 'my-secret', // for cookies signature
+    secret: process.env.SECRET_COOKIE, // for cookies signature
+  });
+  app.enableCors({
+    origin:  process.env.CLIENT_ORIGIN, // Port của Next.js
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
   });
   app.setGlobalPrefix('api', { exclude: ['api-docs', ''] });
   app.useGlobalPipes(
@@ -40,6 +45,7 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true, // lưu local
+       docExpansion: "none",
     },
   });
 

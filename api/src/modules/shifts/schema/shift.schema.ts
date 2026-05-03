@@ -16,6 +16,7 @@ export class Shift {
     type: MongooseSchema.Types.ObjectId,
     ref: 'Business',
     required: true,
+    index:true
   })
   business!: Types.ObjectId | BusinessDocument;
 

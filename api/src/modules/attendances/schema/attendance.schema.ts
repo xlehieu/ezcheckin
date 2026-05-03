@@ -4,11 +4,16 @@ import { UserDocument } from '@/modules/users/schema/users.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 export type AttendanceDocument = Attendance & Document;
-export enum AttendanceStatus {
-  ON_TIME="ON_TIME",
-  LATE="LATE",
-  ABSENT="ABSENT"
+export enum AttendanceCheckinStatus {
+  ON_TIME = 'ON_TIME',
+  LATE = 'LATE',
 }
+
+export enum AttendanceCheckoutStatus {
+  ON_TIME = 'ON_TIME',
+  EARLY = 'EARLY',
+}
+
 @Schema({ timestamps: true })
 export class Attendance {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
@@ -20,17 +25,27 @@ export class Attendance {
   @Prop({ type: Types.ObjectId, ref: 'Shift', required: true, index: true })
   shift: Types.ObjectId | ShiftDocument;
 
+  @Prop({ required: true, index: true })
+  workDate: Date;
+
   @Prop({ required: true })
   checkinTime: Date;
 
-  @Prop()
-  checkoutTime?: Date;
+  @Prop({ type: Date, default: null })
+  checkoutTime: Date | null;
 
   @Prop({
-    enum: Object.values(AttendanceStatus),
-    default: AttendanceStatus.ON_TIME,
+    enum: Object.values(AttendanceCheckinStatus),
+    default: AttendanceCheckinStatus.ON_TIME,
   })
-  status: AttendanceStatus;
+  statusCheckin: AttendanceCheckinStatus;
+
+  @Prop({
+    type: String,
+    enum: Object.values(AttendanceCheckoutStatus),
+    default: null,
+  })
+  statusCheckout: AttendanceCheckoutStatus;
 
   @Prop({
     type: {
@@ -39,13 +54,28 @@ export class Attendance {
     },
     coordinates: [Number],
   })
-  location?: {
+  checkinLocation?: {
+    type: 'Point';
+    coordinates: [number, number]; // [lng, lat]
+  };
+
+  @Prop({
+    type: {
+      type: String,
+      enum: ['Point'],
+    },
+    coordinates: [Number],
+  })
+  checkoutLocation?: {
     type: 'Point';
     coordinates: [number, number]; // [lng, lat]
   };
 }
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);
-AttendanceSchema.index({ location: '2dsphere' });
+AttendanceSchema.index({ checkinLocation: '2dsphere' });
+AttendanceSchema.index({ checkoutLocation: '2dsphere' });
 
-// ❗ Tránh checkin 2 lần trong 1 ca
-AttendanceSchema.index({ user: 1, shift: 1, business: 1 }, { unique: true });
+AttendanceSchema.index(
+  { user: 1, business: 1, shift: 1, workDate: 1 },
+  { unique: true },
+);

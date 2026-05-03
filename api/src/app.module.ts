@@ -25,7 +25,7 @@ import { AttendancesModule } from './modules/attendances/attendances.module';
         uri: configService.get<string>('MONGODB_URI'),
         retryAttempts: 5,
         retryDelay: 3000,
-        autoIndex: configService.get<string>('NODE_ENV') !== 'dev',
+        autoIndex: configService.get<string>('NODE_ENV') === 'dev',
       }),
     }),
     UsersModule,

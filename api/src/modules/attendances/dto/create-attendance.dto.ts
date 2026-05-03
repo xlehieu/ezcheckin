@@ -6,9 +6,17 @@ import {
   ArrayMinSize,
   ArrayMaxSize,
   IsNumber,
+  IsString,
 } from 'class-validator';
 
 export class CreateAttendanceDto {
+  @ApiProperty({
+    description: 'object id',
+    required: false,
+  })
+  @IsString({message:"ShiftId phải là chuỗi"})
+  shiftId:string
+  
   @ApiProperty({
     example: [106.70098, 10.77689],
     description: '[longitude, latitude]',
