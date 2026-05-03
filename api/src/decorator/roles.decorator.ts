@@ -1,5 +1,5 @@
 // roles.decorator.ts
-import { RoleName } from '@/modules/users/schema/role.schema';
+import { RoleName } from '@/modules/users/schema/users.schema';
 import { SetMetadata } from '@nestjs/common';
 
 export const ROLES_KEY = 'roles';

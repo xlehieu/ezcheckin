@@ -1,36 +1,33 @@
+import { HASH_SALT } from '@/shared/constants';
 import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
   HttpStatus,
   Injectable,
-  UnauthorizedException,
-  ConflictException,
-  BadRequestException,
   InternalServerErrorException,
   Logger,
-  ForbiddenException,
-  HttpException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Connection, Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { User, UserDocument } from '../users/schema/users.schema';
-import {
-  RefreshToken,
-  RefreshTokenDocument,
-} from './schema/refresh-token.schema';
-import { ValidateLoginDto, RegisterDto, UserLogin } from './dto/auth.dto';
-import { Role, RoleDocument, RoleName } from '../users/schema/role.schema';
-import { HASH_SALT } from '@/shared/constants/index.const';
+import dayjs from 'dayjs';
+import { lowerCase, startCase } from 'lodash';
+import { Connection, Model, Types } from 'mongoose';
 import { Business, BusinessDocument } from '../business/schema/business.entity';
 import { License, LicenseDocument } from '../license/schema/license.schema';
-import dayjs from 'dayjs';
-import { startCase, lowerCase } from 'lodash';
 import {
   SystemConfig,
   SystemConfigDocument,
 } from '../system-config/schema/system-config.schema';
-import { Permission } from '../users/schema/permission.schema';
+import { RoleName, User, UserDocument } from '../users/schema/users.schema';
+import { RegisterDto, UserLogin, ValidateLoginDto } from './dto/auth.dto';
+import {
+  RefreshToken,
+  RefreshTokenDocument,
+} from './schema/refresh-token.schema';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +36,6 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(RefreshToken.name)
     private tokenModel: Model<RefreshTokenDocument>,
-    @InjectModel(Role.name) private roleModel: Model<RoleDocument>,
     @InjectModel(Business.name) private businessModel: Model<BusinessDocument>,
     @InjectModel(License.name) private licenseModel: Model<LicenseDocument>,
     @InjectModel(SystemConfig.name)
@@ -54,16 +50,6 @@ export class AuthService {
     if (existing) {
       throw new ConflictException('Email đã tồn tại');
     }
-
-    const roleAdmin = await this.roleModel
-      .findOne({ name: RoleName.ADMIN })
-      .select('_id')
-      .lean();
-
-    if (!roleAdmin) {
-      throw new BadRequestException('Hệ thống chưa cấu hình quyền ADMIN.');
-    }
-
     const hashedPassword = await bcrypt.hash(data.password, HASH_SALT);
 
     // --- BẮT ĐẦU TRANSACTION ---
@@ -83,7 +69,7 @@ export class AuthService {
         _id: userId,
         email: data.email,
         password: hashedPassword,
-        role: roleAdmin._id,
+        role: RoleName.ADMIN,
         business: businessId,
       });
 
@@ -129,19 +115,11 @@ export class AuthService {
     const stored = await this.tokenModel
       .findOne({ token: refreshToken })
       .populate<{
-        user: UserDocument & {
-          role: RoleDocument & {
-            permissions: Omit<Permission, 'description'>[];
-          };
-        };
+        user: UserDocument
       }>({
         path: 'user', // Cấp 1: Populate thông tin User
         populate: {
           path: 'role', // Cấp 2: Populate thông tin Role nằm bên trong User
-          populate: {
-            path: 'permissions',
-            select: 'subject action',
-          },
         },
       })
       .lean();
@@ -157,13 +135,10 @@ export class AuthService {
 
     // Cấp cặp token mới
     return this.generateTokens({
-      _id: stored?.user._id.toString(),
+      sub: stored?.user._id.toString(),
       email: stored?.user.email,
-      role: stored?.user.role.name,
+      role: stored?.user.role,
       businessId: stored?.user?.business.toString(),
-      permissions: stored?.user?.role.permissions.map(
-        (p) => `${p.subject}:${p.action}`,
-      ),
     });
   }
 
@@ -180,11 +155,10 @@ export class AuthService {
       });
     }
     const payload: UserLogin = {
-      _id: user._id,
+      sub: user.sub,
       email: user.email,
       role: user.role, // Thêm role vào payload để dùng cho RolesGuard
       businessId: user.businessId,
-      permissions: user.permissions,
     };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -202,7 +176,7 @@ export class AuthService {
     // Lưu Refresh Token vào MongoDB
     await this.tokenModel.create({
       token: refreshToken,
-      user: new Types.ObjectId(user._id),
+      user: new Types.ObjectId(user.sub),
       expires_at: expiresAt,
     });
 
@@ -214,17 +188,6 @@ export class AuthService {
       .findOne({ email: data.email })
       //   dùng + vì trong định nghĩa select là false rồi
       .select('+password')
-      .populate<{
-        role: RoleDocument & {
-          permissions: Omit<Permission, 'description'>[];
-        };
-      }>({
-        path: 'role',
-        populate: {
-          path: 'permissions',
-          select: 'subject action',
-        },
-      })
       .populate<{ business: BusinessDocument & { license: LicenseDocument } }>({
         path: 'business',
         populate: {
@@ -254,11 +217,10 @@ export class AuthService {
       throw new UnauthorizedException('Thông tin đăng nhập không chính xác');
 
     return {
-      _id: user._id?.toString(),
+      sub: user._id?.toString(),
       email: user.email,
-      role: user.role.name,
+      role: user.role,
       businessId: user.business._id.toString(),
-      permissions: user.role.permissions.map((p) => `${p.subject}:${p.action}`),
     };
   }
 }

@@ -14,9 +14,9 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from '@/decorator/roles.decorator';
-import { RoleName } from './schema/role.schema';
 import { UserLogin } from '../auth/dto/auth.dto';
 import { QueryUserDto } from './dto/query-user.dto';
+import { RoleName } from './schema/users.schema';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -49,7 +49,11 @@ export class UsersController {
   async findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }
-
+@Get('my-profile')
+  @ApiOperation({ summary: 'Profile' })
+  async getMyProfile(@Request() req:{user:UserLogin}) {
+    return this.userService.findOne(req.user.sub);
+  }
   @Patch(':id')
   @Roles(RoleName.ADMIN, RoleName.MANAGER)
   @ApiOperation({ summary: 'Cập nhật thông tin người dùng' })

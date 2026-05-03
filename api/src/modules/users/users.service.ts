@@ -1,4 +1,4 @@
-import { HASH_SALT } from '@/shared/constants/index.const';
+import { HASH_SALT } from '@/shared/constants';
 import { buildSearchQueryMongodb } from '@/utils/queryMongo.utils';
 import { buildPagination } from '@/utils/response.utils';
 import {
@@ -60,10 +60,6 @@ export class UsersService {
         .skip(skip)
         .limit(pageSize)
         .sort({ createdAt: -1 })
-        .populate({
-          path: 'role',
-          select: 'name',
-        })
         .lean(),
       this.userModel.countDocuments(query),
     ]);
@@ -77,8 +73,10 @@ export class UsersService {
   async findOne(id: string) {
     const user = await this.userModel
       .findById(id)
-      .populate('role')
-      .populate('business')
+      .populate({
+        path:'business',
+        select:"-license"
+      })
       .exec();
 
     if (!user) {
@@ -102,7 +100,7 @@ export class UsersService {
     if (data.roleId) data.role = new Types.ObjectId(data.roleId);
 
     const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, { $set: data }, { new: true })
+      .findByIdAndUpdate(id, { $set: data }, { returnDocument: 'after' })
       .exec();
 
     if (!updatedUser) {
@@ -122,7 +120,7 @@ export class UsersService {
         isDeleted: true,
         deletedAt: new Date(),
       },
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!result) {
@@ -139,7 +137,7 @@ export class UsersService {
     return this.userModel.findByIdAndUpdate(
       id,
       { isDeleted: false, deletedAt: null },
-      { new: true },
+      { returnDocument: 'after' },
     );
   }
 }

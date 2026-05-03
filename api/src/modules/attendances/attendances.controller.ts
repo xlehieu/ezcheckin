@@ -7,11 +7,11 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
 export class AttendancesController {
   constructor(private readonly attendancesService: AttendancesService) {}
 
-  @Post()
+  @Post("checkin-checkout")
   create(
     @Body() createAttendanceDto: CreateAttendanceDto,
     @Request() req: { user: UserLogin },
   ) {
-    return this.attendancesService.create(createAttendanceDto, req.user);
+    return this.attendancesService.checkinCheckout(createAttendanceDto, req.user);
   }
 }

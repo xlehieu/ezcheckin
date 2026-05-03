@@ -1,10 +1,10 @@
-import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import fastifyCookie from '@fastify/cookie';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import chalk from 'chalk';
-import session from 'express-session';
-import MongoStore from 'connect-mongo';
+import { AppModule } from './app.module';
 
 import * as dotenv from 'dotenv';
 dotenv.config({
@@ -12,7 +12,10 @@ dotenv.config({
 });
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
   const logger = new Logger();
   // 1. Cấu hình Swagger
   const config = new DocumentBuilder()
@@ -21,21 +24,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  app.use(
-    session({
-      secret: process.env.SECRET_SESSION, // Dùng env variable
-      resave: false, // có lưu vào db nếu có thay đổi, true là lưu vào db mọi request
-      saveUninitialized: false, // chỉ lưu khi có dữ liệu
-      store: new MongoStore({
-        mongoUrl: process.env.MONGODB_URI,
-      }),
-      cookie: {
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        httpOnly: true,
-        secure: false, // Đặt true nếu dùng HTTPS
-      },
-    }),
-  );
+    await app.register(fastifyCookie as any, {
+    secret: 'my-secret', // for cookies signature
+  });
   app.setGlobalPrefix('api', { exclude: ['api-docs', ''] });
   app.useGlobalPipes(
     new ValidationPipe({

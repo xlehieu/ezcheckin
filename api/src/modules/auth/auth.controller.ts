@@ -1,23 +1,24 @@
 // auth-service/src/auth.controller.ts
+import { Public } from '@/decorator/public.decorator';
+import { LocalAuthGuard } from '@/passport/local-auth.guard';
 import {
-  Controller,
-  Post,
   Body,
-  UseGuards,
-  Request,
+  Controller,
   HttpCode,
-  Session,
+  Post,
+  Request,
+  Res,
+  UseGuards
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import {
-  ValidateLoginDto,
+  RefreshTokenDto,
   RegisterDto,
   UserLogin,
-  RefreshTokenDto,
+  ValidateLoginDto,
 } from './dto/auth.dto';
-import { Public } from '@/decorator/public.decorator';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
-import { LocalAuthGuard } from '@/passport/local-auth.guard';
+import type { FastifyReply } from 'fastify';
 
 @Controller('auth')
 @ApiBearerAuth()
@@ -37,13 +38,23 @@ export class AuthController {
   //request này được lấy ra từ guard LocalAuthGuard => LocalStrategy
   async login(
     @Request() req: { user: UserLogin },
-    @Session() session,
-  ): Promise<{
-    accessToken: string;
-    refreshToken: string;
-  }> {
-    // session
-    return this.authService.login(req.user);
+    @Res({ passthrough: true }) res: FastifyReply,
+  ){
+    const { accessToken, refreshToken } = await this.authService.login(req.user);
+
+  res.setCookie('refresh_token', refreshToken, {
+    httpOnly: true,
+    secure: false, // chỉ gửi qua https hay không
+    sameSite: 'lax',
+    path: '/',
+  });
+  res.setCookie("access_token",accessToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    path: '/',
+  })
+    return true
   }
 
   @Post('refresh')

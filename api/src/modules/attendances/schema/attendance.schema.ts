@@ -4,6 +4,11 @@ import { UserDocument } from '@/modules/users/schema/users.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 export type AttendanceDocument = Attendance & Document;
+export enum AttendanceStatus {
+  ON_TIME="ON_TIME",
+  LATE="LATE",
+  ABSENT="ABSENT"
+}
 @Schema({ timestamps: true })
 export class Attendance {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
@@ -22,10 +27,10 @@ export class Attendance {
   checkoutTime?: Date;
 
   @Prop({
-    enum: ['ON_TIME', 'LATE', 'ABSENT'],
-    default: 'ON_TIME',
+    enum: Object.values(AttendanceStatus),
+    default: AttendanceStatus.ON_TIME,
   })
-  status: string;
+  status: AttendanceStatus;
 
   @Prop({
     type: {

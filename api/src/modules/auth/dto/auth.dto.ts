@@ -1,5 +1,5 @@
 import { Match } from '@/decorator/match.decorator';
-import { RoleName } from '@/modules/users/schema/role.schema';
+import { RoleName } from '@/modules/users/schema/users.schema';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
@@ -14,11 +14,10 @@ export class ValidateLoginDto {
   password: string;
 }
 export class UserLogin {
-  _id: string;
+  sub: string;
   email: string;
   role: RoleName;
   businessId: string;
-  permissions: string[];
 }
 export class RegisterDto {
   @ApiProperty({ example: 'user@example.com' })

@@ -1,8 +1,7 @@
 import { QueryListDto } from '@/shared/dto/query.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { IsEnum, IsOptional } from 'class-validator';
-import { RoleName } from '../schema/role.schema';
+import { RoleName } from '../schema/users.schema';
 
 export class QueryUserDto extends QueryListDto {
   @IsOptional()

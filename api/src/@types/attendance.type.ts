@@ -1,0 +1,1 @@
+export type CheckinStatus ="ON_TIME" |"LATE"|"NOT_YET"

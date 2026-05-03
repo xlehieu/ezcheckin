@@ -32,18 +32,42 @@ export class Business {
   @Prop({
     type: {
       type: String,
-      enum: ['Point'],
-      required: true,
+      enum: ['Polygon'],
+      default: 'Polygon',
     },
     coordinates: {
-      type: [Number],
-      required: true,
+      type: [[[Number]]], // 👈 mảng 3 chiều
     },
   })
   location: {
-    type: 'Point';
-    coordinates: [number, number];
+    type: 'Polygon';
+    coordinates: number[][][];
   };
+  // locatio sẽ có dạng 
+  //   location = {
+  //   type: 'Polygon',
+  //   coordinates: [
+  //     [
+  //       [106.700, 10.770],
+  //       [106.705, 10.770],
+  //       [106.705, 10.775],
+  //       [106.700, 10.775],
+  //       [106.700, 10.770],
+  //     ],
+  //   ],
+  // };
+
+  @Prop({ type: Number,default:0 })
+  earlyCheckinMinutes?: number;
+
+  @Prop({ type: Number,default:0 })
+  lateCheckoutMinutes?: number;
+
+  @Prop({ type: Number,default:0 })
+  graceCheckinMinutes?: number;
+
+  @Prop({ type: Number,default:0 })
+  graceCheckoutMinutes?: number;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);

@@ -1,3 +1,4 @@
+import { BusinessDocument } from '@/modules/business/schema/business.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
   Aggregate,
@@ -6,11 +7,13 @@ import {
   Query,
   Types,
 } from 'mongoose';
-import { Role, RoleDocument } from './role.schema';
-import { BusinessDocument } from '@/modules/business/schema/business.entity';
 
 export type UserDocument = User & Document;
-
+export enum RoleName {
+  ADMIN = 'ADMIN',
+  MANAGER = 'MANAGER',
+  EMPLOYEE = 'EMPLOYEE',
+}
 @Schema({
   timestamps: true,
   toJSON: {
@@ -33,13 +36,14 @@ export class User {
   @Prop({ unique: true, sparse: true })
   employeeCode: string; // Mã nhân viên (ví dụ: NV001)
 
-  // Thay đổi này - dùng Types.ObjectId thay vì ref 'Role'
   @Prop({
-    type: MongooseSchema.Types.ObjectId,
-    ref: 'Role',
-    required: true,
-  })
-  role: Types.ObjectId | RoleDocument;
+      type: String,
+      required: true,
+      unique: true,
+      enum: Object.values(RoleName), // Chỉ cho phép các giá trị trong enum
+      default: RoleName.EMPLOYEE,
+    })
+    role: RoleName; // Ví dụ: "ADMIN", "MANAGER", "EMPLOYEE"
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,

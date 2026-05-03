@@ -14,9 +14,9 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateShiftDto } from './dto/create-shift.dto';
 import { UpdateShiftDto } from './dto/update-shift.dto';
 import { Roles } from '@/decorator/roles.decorator';
-import { RoleName } from '../users/schema/role.schema';
 import { UserLogin } from '@/modules/auth/dto/auth.dto';
 import { QueryListDto } from '@/shared/dto/query.dto';
+import { RoleName } from '../users/schema/users.schema';
 
 @Controller('shifts')
 @ApiTags('Shifts')

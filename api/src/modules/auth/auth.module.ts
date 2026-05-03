@@ -13,11 +13,6 @@ import {
   SystemConfig,
   SystemConfigSchema,
 } from '../system-config/schema/system-config.schema';
-import {
-  Permission,
-  PermissionSchema,
-} from '../users/schema/permission.schema';
-import { Role, RoleSchema } from '../users/schema/role.schema';
 import { User, UserSchema } from '../users/schema/users.schema';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -31,8 +26,6 @@ import {
     // Thêm dòng này
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      { name: Role.name, schema: RoleSchema },
-      { name: Permission.name, schema: PermissionSchema },
       { name: License.name, schema: LicenseSchema },
       { name: Business.name, schema: BusinessSchema },
       { name: SystemConfig.name, schema: SystemConfigSchema },

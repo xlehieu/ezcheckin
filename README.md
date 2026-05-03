@@ -1,4 +1,6 @@
-# Ứng dụng Check-in/Check-out với QR Code + GPS
+# Ứng dụng Check-in/Check-out với QR Code + GPS -
+
+# NOTE : Đang trong quá trình dev
 
 ## 📋 Mô tả dự án
 
@@ -7,7 +9,9 @@
 ## 🧠 Giới thiệu Công nghệ
 
 ### NextJS
+
 **NextJS** là React framework hiện đại cho phép xây dựng web app full-stack. Nó cung cấp:
+
 - Server-side rendering (SSR) - tối ưu SEO
 - Static site generation (SSG) - tốc độ nhanh
 - API routes tích hợp sẵn
@@ -18,7 +22,9 @@
 Phù hợp xây dựng frontend có tính tương tác cao, loading nhanh.
 
 ### NestJS
+
 **NestJS** là framework Node.js hiện đại để xây dựng backend scalable. Đặc điểm:
+
 - Architecture dựa trên modules, controllers, services
 - Dependency injection tích hợp
 - TypeScript first
@@ -29,7 +35,9 @@ Phù hợp xây dựng frontend có tính tương tác cao, loading nhanh.
 Phù hợp xây dựng API mạnh mẽ, có thể mở rộng.
 
 ### MongoDB
+
 **MongoDB** là database NoSQL lưu trữ dạng JSON (BSON). Ưu điểm:
+
 - Lưu trữ flexible - không cần schema cố định
 - Dễ mở rộng dữ liệu (thêm field mới không làm ảnh hưởng record cũ)
 - Tốc độ truy vấn nhanh
@@ -43,6 +51,7 @@ Phù hợp cho ứng dụng này vì có thể lưu vị trí GPS, metadata linh
 ## 🛠️ Tech Stack
 
 ### Frontend (NextJS)
+
 - **Framework:** NextJS 14+
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
@@ -52,6 +61,7 @@ Phù hợp cho ứng dụng này vì có thể lưu vị trí GPS, metadata linh
 - **HTTP Client:** Axios hoặc Fetch API
 
 ### Backend (NestJS)
+
 - **Framework:** NestJS
 - **Language:** TypeScript
 - **Database:** MongoDB
@@ -94,24 +104,29 @@ my-project/
 ## 🎯 Chức năng chính
 
 ### 1. **Scan QR Code**
+
 - Nhân viên scan QR code tại công ty để check-in/out
 - Xác thực QR code hợp lệ
 
 ### 2. **Xác minh GPS**
+
 - Kiểm tra vị trí nhân viên có trong bán kính cho phép (500m - 1km)
 - Ghi nhận tọa độ vị trí check-in
 
 ### 3. **Lưu dữ liệu**
+
 - Lưu thời gian check-in/out
 - Lưu vị trí GPS
 - Lưu thiết bị/browser sử dụng
 
 ### 4. **Báo cáo & Thống kê**
+
 - Xem lịch sử check-in cá nhân
 - Báo cáo giờ làm việc
 - Thống kê có mặt/vắng mặt
 
 ### 5. **Admin Dashboard**
+
 - Quản lý nhân viên
 - Xem lịch sử toàn công ty
 - Tạo/quản lý QR code điểm check-in
@@ -120,24 +135,29 @@ my-project/
 ## 🚀 Hướng dẫn chạy
 
 ### Yêu cầu
+
 - Node.js 16+
 - npm hoặc pnpm
 - PostgreSQL (hoặc MongoDB)
 
 ### Backend Setup
+
 ```bash
 cd api
 npm install
 npm run start:dev
 ```
+
 Backend chạy tại `http://localhost:3000`
 
 ### Frontend Setup
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
 Frontend chạy tại `http://localhost:3001`
 
 ## 📡 API Endpoints (Ví dụ)

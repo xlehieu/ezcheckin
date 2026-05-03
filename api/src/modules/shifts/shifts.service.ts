@@ -136,7 +136,7 @@ export class ShiftsService {
         isDeleted: true,
         deletedAt: new Date(),
       },
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!result) {
@@ -159,7 +159,7 @@ export class ShiftsService {
         isDeleted: false,
         deletedAt: null,
       },
-      { new: true },
+      { returnDocument: 'after' },
     );
   }
 }
