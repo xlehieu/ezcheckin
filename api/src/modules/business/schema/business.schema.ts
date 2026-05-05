@@ -30,20 +30,11 @@ export class Business {
   isActive: boolean;
 
   @Prop({
-    type: {
-      type: String,
-      enum: ['Polygon'],
-      default: 'Polygon',
-    },
-    coordinates: {
-      type: [[[Number]]], // 👈 mảng 3 chiều
-    },
+    type: [[Number]],
+    required: true,
   })
-  location: {
-    type: 'Polygon';
-    coordinates: number[][][];
-  };
-  // locatio sẽ có dạng 
+  location: number[][];
+  // locatio sẽ có dạng
   //   location = {
   //   type: 'Polygon',
   //   coordinates: [
@@ -57,18 +48,17 @@ export class Business {
   //   ],
   // };
 
-  @Prop({ type: Number,default:0 })
+  @Prop({ type: Number, default: 0 })
   earlyCheckinMinutes?: number;
 
-  @Prop({ type: Number,default:0 })
+  @Prop({ type: Number, default: 0 })
   lateCheckoutMinutes?: number;
 
-  @Prop({ type: Number,default:0 })
+  @Prop({ type: Number, default: 0 })
   graceCheckinMinutes?: number;
 
-  @Prop({ type: Number,default:0 })
+  @Prop({ type: Number, default: 0 })
   graceCheckoutMinutes?: number;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
-BusinessSchema.index({ location: '2dsphere' });

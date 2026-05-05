@@ -1,4 +1,4 @@
-import { BusinessDocument } from '@/modules/business/schema/business.entity';
+import { BusinessDocument } from '@/modules/business/schema/business.schema';
 import { ShiftDocument } from '@/modules/shifts/schema/shift.schema';
 import { UserDocument } from '@/modules/users/schema/users.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';

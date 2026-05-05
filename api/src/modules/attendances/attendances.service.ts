@@ -9,7 +9,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { Model, QueryFilter, Types } from 'mongoose';
-import { Business, BusinessDocument } from '../business/schema/business.entity';
+import { Business, BusinessDocument } from '../business/schema/business.schema';
 import { Shift, ShiftDocument } from '../shifts/schema/shift.schema';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import {

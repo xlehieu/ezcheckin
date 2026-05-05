@@ -16,7 +16,7 @@ import * as bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
 import { lowerCase, startCase } from 'lodash';
 import { Connection, Model, Types } from 'mongoose';
-import { Business, BusinessDocument } from '../business/schema/business.entity';
+import { Business, BusinessDocument } from '../business/schema/business.schema';
 import { License, LicenseDocument } from '../license/schema/license.schema';
 import {
   SystemConfig,
@@ -77,6 +77,7 @@ export class AuthService {
         _id: businessId,
         admin: userId,
         license: licenseId,
+        location:[]
       });
 
       const newLicense = new this.licenseModel({

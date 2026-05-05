@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Business, BusinessSchema } from '../business/schema/business.entity';
+import { Business, BusinessSchema } from '../business/schema/business.schema';
 import { Shift, ShiftSchema } from '../shifts/schema/shift.schema';
 import { AttendancesController } from './attendances.controller';
 import { AttendancesService } from './attendances.service';

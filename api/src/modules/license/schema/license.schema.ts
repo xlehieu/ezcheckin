@@ -1,4 +1,4 @@
-import { BusinessDocument } from '@/modules/business/schema/business.entity';
+import { BusinessDocument } from '@/modules/business/schema/business.schema';
 import { User } from '@/modules/users/schema/users.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';

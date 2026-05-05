@@ -1,4 +1,4 @@
-import { BusinessDocument } from '@/modules/business/schema/business.entity';
+import { BusinessDocument } from '@/modules/business/schema/business.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
   Aggregate,
@@ -39,7 +39,6 @@ export class User {
   @Prop({
       type: String,
       required: true,
-      unique: true,
       enum: Object.values(RoleName), // Chỉ cho phép các giá trị trong enum
       default: RoleName.EMPLOYEE,
     })

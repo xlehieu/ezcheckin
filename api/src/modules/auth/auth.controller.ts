@@ -8,7 +8,7 @@ import {
   Post,
   Request,
   Res,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -39,29 +39,50 @@ export class AuthController {
   async login(
     @Request() req: { user: UserLogin },
     @Res({ passthrough: true }) res: FastifyReply,
-  ){
-    const { accessToken, refreshToken } = await this.authService.login(req.user);
+  ) {
+    const { accessToken, refreshToken } = await this.authService.login(
+      req.user,
+    );
 
-  res.setCookie('refresh_token', refreshToken, {
-    httpOnly: true,
-    secure: false, // chỉ gửi qua https hay không
-    sameSite: 'lax',
-    path: '/',
-  });
-  res.setCookie("access_token",accessToken, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-    path: '/',
-  })
-    return true
+    res.setCookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false, // chỉ gửi qua https hay không
+      sameSite: 'lax',
+      path: '/',
+    });
+    res.setCookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+    return true;
   }
 
   @Post('refresh')
   @ApiBody({ type: RefreshTokenDto })
   @HttpCode(200)
-  refresh(@Body() data: RefreshTokenDto) {
-    return this.authService.refresh(data.refreshToken);
+  async refresh(
+    @Request() req: { user: UserLogin },
+    @Res({ passthrough: true }) res: FastifyReply,
+  ) {
+    const { accessToken, refreshToken } = await this.authService.login(
+      req.user,
+    );
+
+    res.setCookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false, // chỉ gửi qua https hay không
+      sameSite: 'lax',
+      path: '/',
+    });
+    res.setCookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+    return true;
   }
 
   @Post('logout')

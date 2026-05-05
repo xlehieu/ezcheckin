@@ -7,7 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtStrategy } from '@/passport/jwt.strategy';
 import { LocalStrategy } from '@/passport/local.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { Business, BusinessSchema } from '../business/schema/business.entity';
+import { Business, BusinessSchema } from '../business/schema/business.schema';
 import { License, LicenseSchema } from '../license/schema/license.schema';
 import {
   SystemConfig,

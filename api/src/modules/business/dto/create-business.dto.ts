@@ -1,6 +1,7 @@
 import { PolygonDto } from '@/shared/dto/polygon.dto';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsNumber,
   IsOptional,
   IsString,
@@ -17,26 +18,16 @@ export class CreateBusinessDto {
   @IsOptional()
   name: string;
 
-  @ApiProperty({
-    description: 'Vị trí doanh nghiệp dạng Polygon (GeoJSON)',
-    type: PolygonDto,
-    example: {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [106.700, 10.770],
-          [106.705, 10.770],
-          [106.705, 10.775],
-          [106.700, 10.775],
-          [106.700, 10.770],
-        ],
-      ],
-    },
+  @ApiPropertyOptional({
+    example: [
+      [106.7, 10.77],
+      [106.705, 10.77],
+    ],
   })
-  @ValidateNested()
   @IsOptional()
-  @Type(() => PolygonDto)
-  location: PolygonDto;
+  @IsArray({ each: true, message: 'Phải là dạng mảng 2 chiều' })
+  @IsArray({ each: true, message: 'Phải là dạng mảng 2 chiều' })
+  location?: number[][];
 
   @ApiPropertyOptional({
     example: 10,

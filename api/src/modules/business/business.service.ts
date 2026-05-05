@@ -9,7 +9,7 @@ import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { buildPagination } from '@/utils/response.utils';
 import { UserLogin } from '../auth/dto/auth.dto';
-import { Business, BusinessDocument } from './schema/business.entity';
+import { Business, BusinessDocument } from './schema/business.schema';
 
 @Injectable()
 export class BusinessService {
@@ -93,13 +93,6 @@ export class BusinessService {
     }
 
     const data = { ...dto };
-
-    if (dto.location?.type === 'Polygon') {
-      data.location = {
-        type: 'Polygon',
-        coordinates: dto.location.coordinates,
-      };
-    }
     const dataJ = await this.businessModel.findOne({_id:id})
     this.logger.log("dataJ",dataJ)
     const updated = await this.businessModel.findOneAndUpdate(
