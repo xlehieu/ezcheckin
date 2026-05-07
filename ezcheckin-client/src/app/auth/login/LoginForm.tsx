@@ -11,7 +11,7 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { login } from "@/features/auth/auth.serverAction"
+import { login } from "@/features/auth/auth.action"
 import { MAIN_ROUTE } from "@/routes/main/main.route"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"

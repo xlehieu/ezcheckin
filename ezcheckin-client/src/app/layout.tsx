@@ -1,6 +1,6 @@
 import { Inter, Geist } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 

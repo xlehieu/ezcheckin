@@ -1,6 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+import qs from "qs";
+export const buildQueryParams = (params: Record<any, string>) => {
+  return qs.stringify(params, {
+    skipNulls: true,
+    addQueryPrefix: true,
+    arrayFormat: "repeat",
+  });
+};

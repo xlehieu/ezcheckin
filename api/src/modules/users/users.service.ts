@@ -66,8 +66,8 @@ export class UsersService {
     return buildPagination({
       data,
       total,
-      current: query.current,
-      pageSize: query.pageSize,
+      current: queryListDto.current,
+      pageSize: queryListDto.pageSize,
     });
   }
   async findOne(id: string) {

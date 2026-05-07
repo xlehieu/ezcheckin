@@ -3,10 +3,17 @@ export function buildPagination({ data, total, current, pageSize }) {
 
   return {
     data,
-    meta: { total, current, pageSize, totalPages },
-    links: {
-      next: current < totalPages ? current + 1 : null,
-      prev: current > 1 ? current - 1 : null,
+    meta: {
+      total,
+      current,
+      pageSize,
+      totalPages,
+      hasNextPage: current < totalPages ? true : false,
+      hasPrevPage: current>1 ? true:false
+      // links: {
+      //   next: current < totalPages ? current + 1 : null,
+      //   prev: current > 1 ? current - 1 : null,
+      // },
     },
   };
 }

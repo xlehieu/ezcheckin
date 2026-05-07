@@ -14,7 +14,7 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { register } from "@/features/auth/auth.serverAction"
+import { register } from "@/features/auth/auth.action"
 import { useRouter } from "next/navigation"
 import { AUTH_ROUTES } from "@/routes/auth/auth.route"
 // import { useRegister } from "@/hooks/tanstack/auth/auth.mutation"

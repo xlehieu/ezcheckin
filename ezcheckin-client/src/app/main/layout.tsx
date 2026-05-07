@@ -1,12 +1,24 @@
-// import { useMyProfile } from "@/hooks/tanstack/users/users.query";
+// app/(dashboard)/layout.tsx
 
+import { getMyProfile } from "@/features/users/user.action";
+import { AUTH_ROUTES } from "@/routes/auth/auth.route";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import AuthGuard from "./_components/AuthGuard";
 
-export default function ({ children }: { children: React.ReactNode }) {
+import { DashboardSkeleton } from "./_components/DashboardSkeleton";
+import DashboardContent from "./_components/DashboardContent";
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+ 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <AuthGuard>{children}</AuthGuard>
+    <Suspense fallback={<DashboardSkeleton />}>
+      <DashboardContent>
+        {children}
+      </DashboardContent>
     </Suspense>
   );
 }

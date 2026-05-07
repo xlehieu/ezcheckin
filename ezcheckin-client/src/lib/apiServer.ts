@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidateTag } from "next/cache";
 import { AUTH_ROUTES } from "@/routes/auth/auth.route";
+import { buildQueryParams } from "@/utils/helpers";
 
 // tránh gọi refresh nhiều lần
 let refreshTokenPromise: Promise<void> | null = null;
@@ -12,6 +13,7 @@ interface FetchOptions extends RequestInit {
   revalidate?: number;
   tagRevalidateAfterAction?: string;
   passError?: boolean;
+  queryParams?:Record<string,any>
 }
 
 // 👉 base URL
@@ -51,9 +53,11 @@ export async function request<T>(
       tags: tags || [],
     },
   };
-
-  const res = await fetch(`${API_BASE_URL}/api${url}`, config);
-  console.log("res", res);
+  let _url = url
+  if(fetchOptions?.queryParams){
+    _url+=buildQueryParams(fetchOptions?.queryParams)
+  }
+  const res = await fetch(`${API_BASE_URL}/api${_url}`, config);
   if (isServer) {
     const setCookies = res.headers.getSetCookie();
 
