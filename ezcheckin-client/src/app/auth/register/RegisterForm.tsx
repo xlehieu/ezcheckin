@@ -14,6 +14,7 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { register } from "@/features/auth/auth.serverAction"
 import { useRouter } from "next/navigation"
 import { AUTH_ROUTES } from "@/routes/auth/auth.route"
 // import { useRegister } from "@/hooks/tanstack/auth/auth.mutation"
@@ -35,7 +36,7 @@ export const registerSchema = z.object({
 export function RegisterForm() {
   // const {mutateAsync:register}=useRegister()
   const [isLoading, setIsLoading] = React.useState(false);
-
+  const router = useRouter()
   const formTanstack = useForm({
     defaultValues: {
       email: "",
@@ -48,16 +49,17 @@ export function RegisterForm() {
     onSubmit: async ({ value }) => {
       try {
         setIsLoading(true);
-        // const result = await register({
-        //   email: value.email,
-        //   password: value.password,
-        //   confirmPassword:value.confirmPassword
-        // });
-
-        // if (result.data) {
-        //   toast.success("Đăng ký thành công! Vui lòng đăng nhập");
-        //   return;
-        // }
+        const result = await register({
+          email: value.email,
+          password: value.password,
+          confirmPassword:value.confirmPassword
+        });
+        console.log(result)
+        if (result?.data?._id) {
+          toast.success("Đăng ký thành công! Vui lòng đăng nhập");
+          router.replace(AUTH_ROUTES.LOGIN)
+          return;
+        }
 
         toast.error("Đăng ký thất bại");
       } catch (error) {

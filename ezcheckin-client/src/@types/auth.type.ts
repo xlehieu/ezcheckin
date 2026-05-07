@@ -7,4 +7,8 @@ export type RegisterPayload = {
   password: string;
   confirmPassword: string;
 };
-export type LoginResponse =boolean
+export type LoginResponse = boolean;
+export type RegisterResponse = {
+  _id:string;
+  email: string;
+};

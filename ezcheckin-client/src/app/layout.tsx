@@ -3,7 +3,7 @@ import "./globals.css";
 import { cn } from "@/utils/helpers";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
-import QueryProvider from "@/provider/QueryProvider";
+
 import "sonner/dist/styles.css"; 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -27,11 +27,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster position="top-right" />
+          <Toaster position="top-right" richColors />
           {/* Main Content: grow để đẩy Footer xuống cuối trang */}
-          <QueryProvider>
+
             <main className="grow w-screen">{children}</main>
-          </QueryProvider>
+
         </ThemeProvider>
       </body>
     </html>
