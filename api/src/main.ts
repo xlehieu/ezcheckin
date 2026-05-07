@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import { AppModule } from './app.module';
 
 import * as dotenv from 'dotenv';
+import fastifyCors from '@fastify/cors';
 dotenv.config({
   path: '.env',
 });
@@ -28,10 +29,21 @@ async function bootstrap() {
     secret: process.env.SECRET_COOKIE, // for cookies signature
   });
   app.enableCors({
-    origin:  process.env.CLIENT_ORIGIN, // Port của Next.js
+    origin: [
+      process.env.CLIENT_ORIGIN as string,
+      /https:\/\/.*\.lhr\.life$/
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+  // await app.register(fastifyCors as any, {
+  //   origin: [
+  //     process.env.CLIENT_ORIGIN as string,
+  //     'http://localhost:1912', // ← Thêm FE local của bạn
+  //   ],
+  //   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  //   credentials: true,
+  // });
   app.setGlobalPrefix('api', { exclude: ['api-docs', ''] });
   app.useGlobalPipes(
     new ValidationPipe({

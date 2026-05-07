@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import type { FastifyReply } from 'fastify';
 import { AuthService } from './auth.service';
 import {
   RefreshTokenDto,
@@ -18,11 +19,17 @@ import {
   UserLogin,
   ValidateLoginDto,
 } from './dto/auth.dto';
-import type { FastifyReply } from 'fastify';
 
 @Controller('auth')
 @ApiBearerAuth()
 export class AuthController {
+  private cookieOptions:any={
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 3600000,
+      path: '/',
+    }
   constructor(private readonly authService: AuthService) {}
   @Public()
   @Post('register')
@@ -40,23 +47,17 @@ export class AuthController {
     @Request() req: { user: UserLogin },
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
-    const { accessToken, refreshToken } = await this.authService.login(
+    const { access_token,refresh_token  } = await this.authService.login(
       req.user,
     );
-
-    res.setCookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: false, // chỉ gửi qua https hay không
-      sameSite: 'lax',
-      path: '/',
+    // deploy đoạn này FE Nextjs server component không lấy được cookie=> không gửi kèm cookie được
+    res.setCookie('refresh_token', refresh_token, {
+      ...this.cookieOptions
     });
-    res.setCookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      path: '/',
+    res.setCookie('access_token', access_token, {
+      ...this.cookieOptions
     });
-    return true;
+    return true
   }
 
   @Post('refresh')
@@ -66,23 +67,20 @@ export class AuthController {
     @Request() req: { user: UserLogin },
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
-    const { accessToken, refreshToken } = await this.authService.login(
+    const { access_token, refresh_token } = await this.authService.login(
       req.user,
     );
 
-    res.setCookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: false, // chỉ gửi qua https hay không
-      sameSite: 'lax',
-      path: '/',
+    res.setCookie('refresh_token', access_token, {
+      ...this.cookieOptions
     });
-    res.setCookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      path: '/',
+    res.setCookie('access_token', refresh_token, {
+      ...this.cookieOptions
     });
-    return true;
+    return {
+      access_token,
+      refresh_token
+    };
   }
 
   @Post('logout')

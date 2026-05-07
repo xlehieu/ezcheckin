@@ -11,6 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
        jwtFromRequest: ExtractJwt.fromExtractors([
         (req: FastifyRequest) => {
           return req?.cookies?.access_token ?? null; // 👈 tên cookie của bạn
+          // return req.headers.authorization ??null
         },
       ]),
       ignoreExpiration: false,

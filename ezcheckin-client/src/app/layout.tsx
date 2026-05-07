@@ -1,8 +1,10 @@
 import { Inter, Geist } from "next/font/google";
-import "@/styles/globals.css";
-import { cn } from "@/lib/utils";
+import "./globals.css";
+import { cn } from "@/utils/helpers";
 import { ThemeProvider } from "next-themes";
-
+import { Toaster } from "sonner";
+import QueryProvider from "@/provider/QueryProvider";
+import "sonner/dist/styles.css"; 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({ subsets: ["latin"] });
@@ -13,7 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
+    <html
+      lang="vi"
+      className={cn("font-sans", geist.variable)}
+      suppressHydrationWarning
+    >
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <ThemeProvider
           attribute="class"
@@ -21,8 +27,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Toaster position="top-right" />
           {/* Main Content: grow để đẩy Footer xuống cuối trang */}
-          <main className="grow w-screen">{children}</main>
+          <QueryProvider>
+            <main className="grow w-screen">{children}</main>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -9,67 +9,8 @@
 ## 🧠 Giới thiệu Công nghệ
 
 ### NextJS
-
-**NextJS** là React framework hiện đại cho phép xây dựng web app full-stack. Nó cung cấp:
-
-- Server-side rendering (SSR) - tối ưu SEO
-- Static site generation (SSG) - tốc độ nhanh
-- API routes tích hợp sẵn
-- Routing tự động
-- Image optimization
-- Deployment dễ dàng
-
-Phù hợp xây dựng frontend có tính tương tác cao, loading nhanh.
-
-### NestJS
-
-**NestJS** là framework Node.js hiện đại để xây dựng backend scalable. Đặc điểm:
-
-- Architecture dựa trên modules, controllers, services
-- Dependency injection tích hợp
-- TypeScript first
-- Hỗ trợ middleware, guards, interceptors
-- Testing dễ dàng
-- RESTful API nhanh chóng
-
-Phù hợp xây dựng API mạnh mẽ, có thể mở rộng.
-
+### NestJS - Monolith - Fastify
 ### MongoDB
-
-**MongoDB** là database NoSQL lưu trữ dạng JSON (BSON). Ưu điểm:
-
-- Lưu trữ flexible - không cần schema cố định
-- Dễ mở rộng dữ liệu (thêm field mới không làm ảnh hưởng record cũ)
-- Tốc độ truy vấn nhanh
-- Hỗ trợ aggregation pipeline mạnh mẽ
-- Lý tưởng cho dữ liệu không có cấu trúc nhất định
-
-Phù hợp cho ứng dụng này vì có thể lưu vị trí GPS, metadata linh hoạt.
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend (NextJS)
-
-- **Framework:** NextJS 14+
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **QR Scanner:** html5-qrcode hoặc react-qr-reader
-- **Maps/GPS:** Leaflet hoặc Google Maps API
-- **State Management:** Zustand hoặc Redux
-- **HTTP Client:** Axios hoặc Fetch API
-
-### Backend (NestJS)
-
-- **Framework:** NestJS
-- **Language:** TypeScript
-- **Database:** MongoDB
-- **ODM:** Mongoose
-- **Authentication:** JWT + Passport.js
-- **Validation:** class-validator, class-transformer
-- **Real-time:** Socket.io (tùy chọn)
-- **Testing:** Jest
 
 ## 📁 Cấu trúc dự án
 
@@ -77,24 +18,24 @@ Phù hợp cho ứng dụng này vì có thể lưu vị trí GPS, metadata linh
 my-project/
 ├── api/                    # Backend NestJS
 │   ├── src/
-│   │   ├── auth/           # Module xác thực
-│   │   ├── employees/      # Module nhân viên
-│   │   ├── checkin/        # Module check-in/out
-│   │   ├── qr/             # Module QR code
-│   │   ├── location/        # Module vị trí GPS
-│   │   └── main.ts
+│   │   ├── modules/        # business logic
+│   │   │   ├── auth/           
+│   │   │   ├── employees/      
+│   │   │   ├── checkin/        
+│   │   │   ├── qr/             
+│   │   │   └── location/       
+│   │   │
+│   │   ├── main.ts
+│   │   └── app.module.ts
+│   │
 │   ├── package.json
 │   └── tsconfig.json
 │
-├── frontend/               # Frontend NextJS
+├── ezcheckin-client/               # Frontend NextJS
 │   ├── app/
 │   │   ├── page.tsx        # Trang chính
-│   │   ├── login/          # Đăng nhập
-│   │   ├── checkin/        # Trang check-in
-│   │   ├── history/        # Lịch sử check-in
-│   │   └── admin/          # Dashboard admin
-│   ├── components/         # Component tái sử dụng
-│   ├── lib/                # Utility functions
+│   ├── components/         
+│   ├── lib/               
 │   ├── package.json
 │   └── next.config.js
 │

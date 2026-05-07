@@ -162,12 +162,12 @@ export class AuthService {
       businessId: user.businessId,
     };
 
-    const accessToken = this.jwtService.sign(payload, {
+    const access_token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
       expiresIn: this.configService.get<any>('EXPIRED_ACCESS_TOKEN'),
     });
 
-    const refreshToken = this.jwtService.sign(payload, {
+    const refresh_token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: '30d',
     });
@@ -176,12 +176,12 @@ export class AuthService {
     expiresAt.setDate(expiresAt.getDate() + 7);
     // Lưu Refresh Token vào MongoDB
     await this.tokenModel.create({
-      token: refreshToken,
+      token: refresh_token,
       user: new Types.ObjectId(user.sub),
       expires_at: expiresAt,
     });
 
-    return { accessToken, refreshToken };
+    return { access_token, refresh_token };
   }
   //region validate user
   async validateUser(data: ValidateLoginDto): Promise<UserLogin> {

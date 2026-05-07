@@ -1,27 +1,20 @@
 "use client"
 
-import * as React from "react"
 import { useForm } from "@tanstack/react-form"
-import { toast } from "sonner"
 import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
-  FieldLabel,
+  FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { login } from "@/features/auth/auth.serverAction"
+import { MAIN_ROUTE } from "@/routes/main/main.route"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export const formSchema = z.object({
   email: z.email("Không đúng định dạng email"),
@@ -32,6 +25,8 @@ export const formSchema = z.object({
 });
 
 export function LoginForm() {
+  const router= useRouter()
+  // const {mutateAsync:login}=useLogin()
   const formTanstack = useForm({
     defaultValues: {
       email: "",
@@ -41,20 +36,22 @@ export function LoginForm() {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      toast("You submitted the following values:", {
-        description: (
-          <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-            <code>{JSON.stringify(value, null, 2)}</code>
-          </pre>
-        ),
-        position: "bottom-right",
-        classNames: {
-          content: "flex flex-col gap-2",
-        },
-        style: {
-          "--border-radius": "calc(var(--radius)  + 4px)",
-        } as React.CSSProperties,
-      })
+      // await login(value)
+
+      const data = await login(value)
+      if(data.data){
+        toast.success("Đăng nhập thành công")
+        router.replace(MAIN_ROUTE.MAIN)
+      }
+      // await signIn("credentials",{
+      //   ...value,
+      //   redirect:false
+      // })
+      // const resLogin = await authenticate(value.email,value.password )
+      // console.log(resLogin)
+      // if(resLogin.error){
+      //   toast.error(resLogin.error)
+      // }
     },
   })
 
@@ -73,7 +70,7 @@ export function LoginForm() {
               field.state.meta.isTouched && !field.state.meta.isValid
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -123,6 +120,7 @@ export function LoginForm() {
         />
 
         <Button 
+        variant={"glow"}
           type="submit" 
           className="glow-button w-full mt-6"
         >
