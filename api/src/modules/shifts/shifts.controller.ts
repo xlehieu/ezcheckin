@@ -33,7 +33,7 @@ export class ShiftsController {
     @Body() data: CreateShiftDto,
     @Request() req: { user: UserLogin },
   ) {
-    return this.shiftsService.create(data, req.user);
+    return await this.shiftsService.create(data, req.user);
   }
 
   // 2. Find all (có query + pagination)
@@ -44,7 +44,7 @@ export class ShiftsController {
     @Query() query: QueryListDto,
     @Request() req: { user: UserLogin },
   ) {
-    return this.shiftsService.findAll(query, req.user);
+    return await this.shiftsService.findAll(query, req.user);
   }
 
   // 3. Find one
@@ -52,7 +52,7 @@ export class ShiftsController {
   @Roles(RoleName.ADMIN, RoleName.MANAGER)
   @ApiOperation({ summary: 'Lấy chi tiết ca làm việc' })
   async findOne(@Param('id') id: string, @Request() req: { user: UserLogin }) {
-    return this.shiftsService.findOne(id, req.user);
+    return await this.shiftsService.findOne(id, req.user);
   }
 
   // 4. Update
@@ -65,7 +65,7 @@ export class ShiftsController {
     @Body() data: UpdateShiftDto,
     @Request() req: { user: UserLogin },
   ) {
-    return this.shiftsService.update(id, data, req.user);
+    return await this.shiftsService.update(id, data, req.user);
   }
 
   @Patch('/toggle/:id')
@@ -75,7 +75,7 @@ export class ShiftsController {
     @Param('id') id: string,
     @Request() req: { user: UserLogin },
   ) {
-    return this.shiftsService.toggleStatus(id, req.user);
+    return await this.shiftsService.toggleStatus(id, req.user);
   }
 
   // 5. Soft delete
@@ -83,7 +83,7 @@ export class ShiftsController {
   @Roles(RoleName.ADMIN)
   @ApiOperation({ summary: 'Xóa mềm ca làm việc' })
   async remove(@Param('id') id: string, @Request() req: { user: UserLogin }) {
-    return this.shiftsService.softDelete(id, req.user);
+    return await this.shiftsService.softDelete(id, req.user);
   }
 
   // 6. Restore
@@ -91,6 +91,6 @@ export class ShiftsController {
   @Roles(RoleName.ADMIN)
   @ApiOperation({ summary: 'Khôi phục ca làm việc đã xóa' })
   async restore(@Param('id') id: string, @Request() req: { user: UserLogin }) {
-    return this.shiftsService.restore(id, req.user);
+    return await this.shiftsService.restore(id, req.user);
   }
 }

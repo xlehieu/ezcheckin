@@ -1,13 +1,15 @@
-// app/(dashboard)/layout.tsx
-
-import { getMyProfile } from "@/features/users/user.action";
-import { AUTH_ROUTES } from "@/routes/auth/auth.route";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import { DashboardSkeleton } from "./_components/DashboardSkeleton";
+import { DashboardSkeleton } from "../../components/skeleton/DashboardSkeleton";
 import DashboardContent from "./_components/DashboardContent";
+import { Metadata } from "next";
 
+export const metadata:Metadata={
+  title:{
+    absolute:"Dashboard",
+    template:"%s | Dashboard"
+  }
+}
 export default async function DashboardLayout({
   children,
 }: {

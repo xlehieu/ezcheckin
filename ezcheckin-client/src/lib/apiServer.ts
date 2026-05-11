@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidateTag } from "next/cache";
 import { AUTH_ROUTES } from "@/routes/auth/auth.route";
 import { buildQueryParams } from "@/utils/helpers";
 
@@ -11,7 +10,6 @@ let refreshTokenPromise: Promise<void> | null = null;
 interface FetchOptions extends RequestInit {
   tags?: string[];
   revalidate?: number;
-  tagRevalidateAfterAction?: string;
   passError?: boolean;
   queryParams?:Record<string,any>
 }
@@ -96,9 +94,9 @@ export async function request<T>(
     }
   }
   // 👉 optional revalidate
-  if (options?.tagRevalidateAfterAction) {
-    revalidateTag(options.tagRevalidateAfterAction, "max");
-  }
+  // if (options?.tagRevalidateAfterAction) {
+  //   revalidateTag(options.tagRevalidateAfterAction, "max");
+  // }
 
   return res.json();
 }

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Moon, Sun } from "lucide-react";
 import Link from "next/link";
-import { MAIN_ROUTE } from "@/routes/main/main.route";
+import { ROUTE_MAIN } from "@/routes/main/main.route";
 import ThemeToggle from "@/components/home-client/ThemeToggle";
 
 const navLinks = ["About", "Courses", "Curriculum", "Pricing", "Blog", "FAQ"];
@@ -50,7 +50,7 @@ const Navbar = () => {
           {/* 
           //region button Checkin
           */}
-          <Link href={MAIN_ROUTE.MAIN} className="glow-button text-sm">
+          <Link href={ROUTE_MAIN.MAIN} className="glow-button text-sm">
             Check in ngay
           </Link>
         </div>
@@ -76,7 +76,7 @@ const Navbar = () => {
               {l}
             </a>
           ))}
-          <Link href={MAIN_ROUTE.MAIN} className="glow-button block text-center mt-3 text-sm">
+          <Link href={ROUTE_MAIN.MAIN} className="glow-button block text-center mt-3 text-sm">
             Check in ngay
           </Link>
         </div>

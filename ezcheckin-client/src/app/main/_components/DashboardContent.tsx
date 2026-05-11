@@ -14,24 +14,26 @@ export default async function DashboardContent({
   children: React.ReactNode;
 }) {
   const myProfile = await getMyProfile();
-
   if (!myProfile.data) {
-    return redirect(AUTH_ROUTES.LOGIN);
+    setTimeout(() => {
+      return redirect(AUTH_ROUTES.LOGIN);
+    }, 10);
   }
 
   const user = myProfile.data;
-
+  if (!user?.role) {
+    return redirect(AUTH_ROUTES.LOGIN);
+  }
   return (
     <>
-      {user.role === "ADMIN" && (
+      {user?.role === "ADMIN" && (
         <AdminDashboardLayout user={user}>{children}</AdminDashboardLayout>
       )}
 
-      {user.role === "MANAGER" && (
+      {user?.role === "MANAGER" && (
         <ManagerDashboardLayout user={user}>{children}</ManagerDashboardLayout>
       )}
-
-      {user.role === "EMPLOYEE" && children}
+      {user?.role === "EMPLOYEE" && children}
     </>
   );
 }

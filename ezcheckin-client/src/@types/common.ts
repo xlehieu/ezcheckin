@@ -4,3 +4,6 @@ export type ListQueryParams = {
   search?: string;
   status?: boolean;
 };
+export type OptionsFetch ={
+  isRevalidate?:boolean
+}

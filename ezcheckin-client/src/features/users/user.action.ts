@@ -19,12 +19,11 @@ export async function getMyProfile() {
 }
 
 export async function getUsers(query?: UserQueryParams) {
-  return apiServer.get<APIPaginationResponse<UserRecord>>(
+  return await apiServer.get<APIPaginationResponse<UserRecord>>(
     `/users`,
     {
-      tags: [USER_TAG.USERS_LIST],
       revalidate: USER_DURATION.USERS_LIST,
-      queryParams:query      
+      queryParams: query,
     }
   );
 }

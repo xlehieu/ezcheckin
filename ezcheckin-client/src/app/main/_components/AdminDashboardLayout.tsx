@@ -2,33 +2,76 @@
 
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { MyProfile } from "@/@types/user.type";
+import { IMAGES_COMMON } from "@/assets/images/common";
+import ThemeToggle from "@/components/home-client/ThemeToggle";
+import { TableSkeleton } from "@/components/skeleton/TableSkeleton";
+import { cn } from "@/lib/utils";
+import { ROUTE_MAIN } from "@/routes/main/main.route";
+import { ROUTE_SHIFTS } from "@/routes/main/shifts.route";
+import { ROUTE_USERS } from "@/routes/main/users.route";
+import { ROUTE_ATTENDANCES } from "@/routes/main/attendances.route";
+import { ROUTE_MY_BUSINESS } from "@/routes/main/my-business.route";
+import { ROUTE_QR } from "@/routes/main/qr.route";
+import { ROUTE_LICENSE } from "@/routes/main/license.route";
 import {
   Bell,
-  Boxes,
+  BriefcaseBusiness,
+  CalendarDays,
   ClipboardList,
+  Clock,
   LayoutDashboard,
   LogOut,
   Menu,
-  Plus,
+  QrCode,
   Settings,
-  X,
+  Shield,
+  Timer,
+  User2,
+  X
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { MyProfile } from "@/@types/user.type";
-import { IMAGES_COMMON } from "@/assets/images/common";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Suspense, useState } from "react";
 
 const sidebarItems = [
   {
     title: "Dashboard",
-    href: "/dashboard",
+    href: ROUTE_MAIN.MAIN,
     icon: LayoutDashboard,
   },
-  
   {
-    title: "Settings",
+    title: "Chấm công",
+    href: ROUTE_ATTENDANCES.ATTENDANCE_LIST,
+    icon: CalendarDays,
+  },
+  {
+    title: "Ca làm việc",
+    href: ROUTE_SHIFTS.SHIFTS_LIST,
+    icon: Clock,
+  },
+  {
+    title: "Nhân sự",
+    href: ROUTE_USERS.USERS_LIST,
+    icon: User2,
+  },
+  {
+    title: "Doanh nghiệp",
+    href: ROUTE_MY_BUSINESS.MY_BUSINESS_DETAIL,
+    icon: BriefcaseBusiness,
+  },
+  {
+    title: "QR Check-in",
+    href: ROUTE_QR.QR_CHECKIN,
+    icon: QrCode,
+  },
+  {
+    title: "Giấy phép",
+    href: ROUTE_LICENSE.LICENSE_LIST,
+    icon: Shield,
+  },
+  {
+    title: "Cài đặt",
     href: "/settings",
     icon: Settings,
   },
@@ -41,7 +84,6 @@ const  AdminDashboardLayout=({
   children: React.ReactNode;
   user: MyProfile;
 }) =>{
-  console.log(user)
   const pathname = usePathname();
 
   const [openSidebar, setOpenSidebar] = useState(false);
@@ -98,6 +140,8 @@ const  AdminDashboardLayout=({
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch
+                    
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all",
                       active
@@ -114,7 +158,7 @@ const  AdminDashboardLayout=({
             </div>
 
             {/* profile */}
-            <div className="p-4">
+            <div className="p-4 lg:hidden">
               <div className="rounded-3xl bg-muted p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex size-12 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
@@ -168,6 +212,7 @@ const  AdminDashboardLayout=({
 
               {/* right */}
               <div className="flex items-center gap-3">
+                <ThemeToggle/>
                 <button className="relative flex size-11 items-center justify-center rounded-2xl bg-background transition hover:bg-muted">
                   <Bell className="size-5" />
 
@@ -195,7 +240,9 @@ const  AdminDashboardLayout=({
 
           {/* PAGE */}
           <main className="p-4 lg:p-8">
+            <Suspense fallback={<TableSkeleton />}>
             {children}
+            </Suspense>
           </main>
         </div>
       </div>

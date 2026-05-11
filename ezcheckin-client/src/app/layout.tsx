@@ -4,11 +4,19 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
-import "sonner/dist/styles.css"; 
+import "sonner/dist/styles.css";
+import AntProvider from "@/provider/AntProvider";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: {
+    default: "Ez Checkin",
+    template: "%s | Ez Checkin",
+  },
+};
 export default function RootLayout({
   children,
 }: {
@@ -29,9 +37,9 @@ export default function RootLayout({
         >
           <Toaster position="top-right" richColors />
           {/* Main Content: grow để đẩy Footer xuống cuối trang */}
-
+          <AntProvider>
             <main className="grow w-screen">{children}</main>
-
+          </AntProvider>
         </ThemeProvider>
       </body>
     </html>

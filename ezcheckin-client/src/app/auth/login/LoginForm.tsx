@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { login } from "@/features/auth/auth.action"
-import { MAIN_ROUTE } from "@/routes/main/main.route"
+import { ROUTE_MAIN } from "@/routes/main/main.route"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
@@ -41,7 +41,7 @@ export function LoginForm() {
       const data = await login(value)
       if(data.data){
         toast.success("Đăng nhập thành công")
-        router.replace(MAIN_ROUTE.MAIN)
+        router.replace(ROUTE_MAIN.MAIN)
       }
       // await signIn("credentials",{
       //   ...value,

@@ -50,7 +50,6 @@ export class ShiftsService {
         .lean(),
       this.shiftModel.countDocuments(query),
     ]);
-
     return buildPagination({
       data,
       total,

@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { LoginForm } from "./LoginForm";
 import { AUTH_ROUTES } from "@/routes/auth/auth.route";
+import { Metadata } from "next";
 
+export const metadata:Metadata={
+  title:{
+    absolute:"Đăng nhập"
+  }
+}
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center gradient-bg">
