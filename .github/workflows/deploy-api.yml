@@ -1,0 +1,135 @@
+name: Deploy API to VPS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/api
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
+          REGISTRY_URL: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VPS_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          
+          ssh -i ~/.ssh/deploy_key "$VPS_USER@$VPS_HOST" << 'EOF'
+          
+          set -e
+          
+          echo "Starting deployment..."
+          
+          # Load environment
+          source ~/.env_ezcheckin || echo "Warning: ~/.env_ezcheckin not found"
+          
+          # Login to registry
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+          
+          # Pull latest image
+          docker pull $REGISTRY_URL:$IMAGE_TAG
+          
+          # Stop and remove old container
+          docker stop ezcheckin-api || true
+          docker rm ezcheckin-api || true
+          
+          # Run new container
+          docker run -d \
+            --name ezcheckin-api \
+            --restart unless-stopped \
+            -p 3000:3000 \
+            --network ezcheckin-network \
+            --env-file ~/.env_ezcheckin \
+            -v ezcheckin-api-logs:/app/logs \
+            $REGISTRY_URL:$IMAGE_TAG
+          
+          echo "Deployment completed successfully!"
+          echo "Container: ezcheckin-api"
+          echo "Image: $REGISTRY_URL:$IMAGE_TAG"
+          
+          # Health check
+          sleep 5
+          if docker ps | grep ezcheckin-api > /dev/null; then
+            echo "✅ Container is running"
+            docker logs ezcheckin-api | tail -20
+          else
+            echo "❌ Container failed to start"
+            exit 1
+          fi
+          
+          EOF
+          
+          # Cleanup
+          rm -f ~/.ssh/deploy_key
+
+      - name: Notify deployment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const statusEmoji = status === 'success' ? '✅' : '❌';
+            
+            github.rest.commits.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `${statusEmoji} Deployment to VPS: ${status.toUpperCase()}`
+            });
