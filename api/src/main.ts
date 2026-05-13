@@ -30,6 +30,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://192.168.1.202",
+      "http://localhost:3000",
       process.env.CLIENT_ORIGIN as string,
       /https:\/\/.*\.lhr\.life$/
     ],
