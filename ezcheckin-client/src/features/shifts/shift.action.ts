@@ -13,7 +13,7 @@ import { revalidateServerAction } from "@/lib/revalidateTagSA";
 import { SHIFT_DURATION, SHIFT_TAG } from "./shift.tag";
 
 export async function getShifts(query?: ShiftQueryParams,options?:OptionsFetch) {
-  if(options?.isRevalidate){
+  if(options?.hasRevalidate){
     revalidateServerAction(SHIFT_TAG.SHIFTS_LIST)
   }
   return await apiServer.get<APIPaginationResponse<ShiftRecord>>(`/shifts`, {
@@ -43,7 +43,7 @@ export async function updateShift(id: string, payload: UpdateShiftPayload) {
 }
 
 export async function deleteShift(id: string) {
-  return await apiServer.delete<APIResponse<boolean>>(`/shifts/${id}`);
+  return await apiServer.delete<APIResponse<boolean>>(`/shifts/${id}`,{});
 }
 
 export async function restoreShift(id: string) {

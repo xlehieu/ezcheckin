@@ -23,10 +23,13 @@ import { useShallow } from "zustand/react/shallow";
 import { OptionsFetch } from "@/@types/common";
 import ShiftModal from "./ShiftModal";
 import TableAction from "@/components/ui/TableAction";
+import ShiftFilter from "./ShiftFilter";
+import { useApp } from "@/hooks/useApp";
 
 const timeToHHmm = (time: string) => time.substring(0, 5);
 
 export default function ShiftList() {
+  const {notify}=useApp()
   const { shiftListFilter, setShiftListFilter } = useShiftStore(
     useShallow((state) => ({
       shiftListFilter: state.shiftListFilter,
@@ -43,11 +46,10 @@ export default function ShiftList() {
     try {
       setLoading(true);
       const res = await getShifts(shiftListFilter, options);
-      console.log("datadatadatadatadatadata", res);
       setData(res.data);
       setTotal(res.meta.total);
     } catch (error) {
-      message.error("Lỗi khi tải danh sách ca làm việc");
+      notify.error("Lỗi khi tải danh sách ca làm việc");
     } finally {
       setLoading(false);
     }
@@ -71,16 +73,16 @@ export default function ShiftList() {
 
   const handleSubmitSuccess = async () => {
     handleCloseModal();
-    await fetchShifts({ isRevalidate: true });
+    await fetchShifts({ hasRevalidate: true });
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteShift(id);
-      message.success("Xóa ca làm việc thành công");
-      fetchShifts();
+      notify.success("Xóa ca làm việc thành công");
+      fetchShifts({hasRevalidate:true});
     } catch (error: any) {
-      message.error(error?.message || "Có lỗi xảy ra");
+      notify.error(error?.message || "Có lỗi xảy ra");
     }
   };
 
@@ -128,7 +130,7 @@ export default function ShiftList() {
           onClickEdit={(value) => {
             setShiftDetail(value)
           }}
-          onConfirmDelete={(value) => {}}
+          onConfirmDelete={(value) => handleDelete(value._id)}
         />
       ),
     },
@@ -136,37 +138,7 @@ export default function ShiftList() {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <Input.Search
-          placeholder="Tìm kiếm..."
-          allowClear
-          className="w-55"
-          value={shiftListFilter.search || ""}
-          onChange={(e) =>
-            setShiftListFilter({
-              ...shiftListFilter,
-              search: e.target.value || undefined,
-              current: 1,
-            })
-          }
-        />
-        <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => fetchShifts({ isRevalidate: true })}
-            loading={loading}
-          >
-            Tải lại
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => handleOpenModal()}
-          >
-            Thêm ca
-          </Button>
-        </Space>
-      </div>
+      <ShiftFilter handleReload={()=>fetchShifts({hasRevalidate:true})} handleOpenModal={handleOpenModal}/>
 
       <Table<ShiftRecord>
         rowKey="_id"

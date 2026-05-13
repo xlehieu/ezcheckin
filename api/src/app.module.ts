@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RolesGuard } from './guard/roles.guard';
 import { LoggingInterceptor } from './interceptor/logging.interceptor';
@@ -14,6 +14,9 @@ import { UsersModule } from './modules/users/users.module';
 import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { TransformInterceptor } from './interceptor/transform.interceptor';
 import { AttendancesModule } from './modules/attendances/attendances.module';
+import { GlobalExceptionFilter } from './filters/GlobalExceptionFilter';
+import { RedisModule } from './shared/redis/redis.module';
+import { QrModule } from './modules/qr/qr.module';
 
 @Module({
   imports: [
@@ -28,6 +31,8 @@ import { AttendancesModule } from './modules/attendances/attendances.module';
         autoIndex: configService.get<string>('NODE_ENV') === 'dev',
       }),
     }),
+    RedisModule,
+    QrModule,
     UsersModule,
     AuthModule,
     LicenseModule,
@@ -54,6 +59,10 @@ import { AttendancesModule } from './modules/attendances/attendances.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    {
+      provide:APP_FILTER,
+      useClass:GlobalExceptionFilter
+    }
     // gọi luôn tại đây khỏi vào trong các module khác rồi khai báo làm gì
   ],
 })

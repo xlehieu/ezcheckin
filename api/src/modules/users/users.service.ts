@@ -3,6 +3,7 @@ import { buildSearchQueryMongodb } from '@/utils/queryMongo.utils';
 import { buildPagination } from '@/utils/response.utils';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -14,7 +15,7 @@ import { UserLogin } from '../auth/dto/auth.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserDocument } from './schema/users.schema';
+import { RoleName, User, UserDocument } from './schema/users.schema';
 @Injectable()
 export class UsersService {
   private logger = new Logger(UsersService.name);
@@ -31,8 +32,9 @@ export class UsersService {
       fullName: data.fullName,
       email: data.email,
       password: hashedPassword,
-      role: new Types.ObjectId(data.roleId),
+      role: data.role,
       business: new Types.ObjectId(creator.businessId),
+      employeeCode:data.employeeCode
     });
 
     const user = await newUser.save();
@@ -88,16 +90,20 @@ export class UsersService {
   /**
    * Cập nhật thông tin user
    */
-  async update(id: string, updateData: UpdateUserDto) {
-    const data: any = { ...updateData };
+  async update(id: string, updateData: UpdateUserDto,user:UserLogin) {
+    const data= { ...updateData };
 
     // Nếu có cập nhật password
     if (data.password) {
       data.password = await bcrypt.hash(data.password, HASH_SALT);
     }
 
-    // Nếu cập nhật roleId hoặc businessId thì map sang ObjectId
-    if (data.roleId) data.role = new Types.ObjectId(data.roleId);
+    if(user.role===RoleName.MANAGER && data.role===RoleName.ADMIN){
+        throw new ForbiddenException("Bạn không có quyền chỉnh sửa quyền này")
+    }
+    else if (user.role===RoleName.ADMIN && id ===user.sub && data.role!==RoleName.ADMIN){
+        throw new ForbiddenException("Bạn là Admin không thể chỉnh sửa quyền của tài khoản mình thành quyền khác")
+    }
 
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, { $set: data }, { returnDocument: 'after' })

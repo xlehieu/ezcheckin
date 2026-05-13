@@ -17,6 +17,7 @@ import { Roles } from '@/decorator/roles.decorator';
 import { UserLogin } from '../auth/dto/auth.dto';
 import { QueryUserDto } from './dto/query-user.dto';
 import { RoleName } from './schema/users.schema';
+import type { AppRequest } from '@/@types/req.type';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -38,7 +39,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Lấy danh sách user' })
   async findAll(
     @Query() query: QueryUserDto,
-    @Request() req: { user: UserLogin },
+    @Request() req: AppRequest
   ) {
     return this.userService.findAll(query, req.user);
   }
@@ -58,8 +59,8 @@ export class UsersController {
   @Roles(RoleName.ADMIN, RoleName.MANAGER)
   @ApiOperation({ summary: 'Cập nhật thông tin người dùng' })
   @ApiBody({ type: UpdateUserDto })
-  async update(@Param('id') id: string, @Body() updateData: UpdateUserDto) {
-    return this.userService.update(id, updateData);
+  async update(@Param('id') id: string, @Body() updateData: UpdateUserDto,@Request() req: AppRequest) {
+    return this.userService.update(id, updateData,req.user);
   }
 
   @Delete(':id')

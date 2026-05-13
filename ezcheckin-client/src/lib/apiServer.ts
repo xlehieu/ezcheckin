@@ -90,7 +90,8 @@ export async function request<T>(
     }
 
     if (!res.ok) {
-      throw new Error(`API Error: ${res.status}`);
+      const errorData = await res.json();
+      throw new Error(errorData.message);
     }
   }
   // 👉 optional revalidate
@@ -182,10 +183,11 @@ export const apiServer = {
     });
   },
 
-  delete<T>(url: string, options?: FetchOptions) {
+  delete<T>(url: string,body:any, options?: FetchOptions) {
     return request<T>(url, {
       ...options,
       method: "DELETE",
+      body:JSON.stringify(body)
     });
   },
 };

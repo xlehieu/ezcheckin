@@ -17,6 +17,7 @@ import { Roles } from '@/decorator/roles.decorator';
 import { UserLogin } from '@/modules/auth/dto/auth.dto';
 import { QueryListDto } from '@/shared/dto/query.dto';
 import { RoleName } from '../users/schema/users.schema';
+import type { AppRequest } from '@/@types/req.type';
 
 @Controller('shifts')
 @ApiTags('Shifts')
@@ -31,7 +32,7 @@ export class ShiftsController {
   @ApiBody({ type: CreateShiftDto })
   async create(
     @Body() data: CreateShiftDto,
-    @Request() req: { user: UserLogin },
+    @Request() req: AppRequest,
   ) {
     return await this.shiftsService.create(data, req.user);
   }
@@ -42,7 +43,7 @@ export class ShiftsController {
   @ApiOperation({ summary: 'Lấy danh sách ca làm việc' })
   async findAll(
     @Query() query: QueryListDto,
-    @Request() req: { user: UserLogin },
+    @Request() req: AppRequest,
   ) {
     return await this.shiftsService.findAll(query, req.user);
   }
@@ -51,7 +52,7 @@ export class ShiftsController {
   @Get(':id')
   @Roles(RoleName.ADMIN, RoleName.MANAGER)
   @ApiOperation({ summary: 'Lấy chi tiết ca làm việc' })
-  async findOne(@Param('id') id: string, @Request() req: { user: UserLogin }) {
+  async findOne(@Param('id') id: string, @Request() req: AppRequest) {
     return await this.shiftsService.findOne(id, req.user);
   }
 
@@ -63,7 +64,7 @@ export class ShiftsController {
   async update(
     @Param('id') id: string,
     @Body() data: UpdateShiftDto,
-    @Request() req: { user: UserLogin },
+    @Request() req: AppRequest,
   ) {
     return await this.shiftsService.update(id, data, req.user);
   }
@@ -73,7 +74,7 @@ export class ShiftsController {
   @ApiOperation({ summary: 'Toggle status' })
   async toggleStatus(
     @Param('id') id: string,
-    @Request() req: { user: UserLogin },
+    @Request() req: AppRequest,
   ) {
     return await this.shiftsService.toggleStatus(id, req.user);
   }
@@ -82,7 +83,7 @@ export class ShiftsController {
   @Delete(':id')
   @Roles(RoleName.ADMIN)
   @ApiOperation({ summary: 'Xóa mềm ca làm việc' })
-  async remove(@Param('id') id: string, @Request() req: { user: UserLogin }) {
+  async remove(@Param('id') id: string, @Request() req: AppRequest) {
     return await this.shiftsService.softDelete(id, req.user);
   }
 
@@ -90,7 +91,7 @@ export class ShiftsController {
   @Post(':id/restore')
   @Roles(RoleName.ADMIN)
   @ApiOperation({ summary: 'Khôi phục ca làm việc đã xóa' })
-  async restore(@Param('id') id: string, @Request() req: { user: UserLogin }) {
+  async restore(@Param('id') id: string, @Request() req: AppRequest) {
     return await this.shiftsService.restore(id, req.user);
   }
 }

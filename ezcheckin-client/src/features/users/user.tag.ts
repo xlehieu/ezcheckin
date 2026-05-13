@@ -1,9 +1,11 @@
-export const USER_TAG={
-    MY_PROFILE:"MY_PROFILE",
-    USERS_LIST:"USER_LIST",
-    USER_DETAIL:"USER_DETAIL",
-}
-export const USER_DURATION={
-    MY_PROFILE:24*60*60*1000,
-    USERS_LIST:2*60*1000
-}
+export const USER_TAG = {
+  MY_PROFILE: "my-profile",
+  USERS_LIST: "users-list",
+  USER_DETAIL: (id: string) => `user-detail-${id}`,
+};
+
+export const USER_DURATION = {
+  MY_PROFILE: 24 * 60 * 60, // 24 hours
+  USERS_LIST: 60, // 1 minute
+  USER_DETAIL: 60, // 1 minute
+};

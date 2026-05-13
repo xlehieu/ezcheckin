@@ -1,13 +1,12 @@
+import fastifyCookie from '@fastify/cookie';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import fastifyCookie from '@fastify/cookie';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import chalk from 'chalk';
 import { AppModule } from './app.module';
 
 import * as dotenv from 'dotenv';
-import fastifyCors from '@fastify/cors';
 dotenv.config({
   path: '.env',
 });
@@ -30,6 +29,7 @@ async function bootstrap() {
   });
   app.enableCors({
     origin: [
+      "http://192.168.1.202",
       process.env.CLIENT_ORIGIN as string,
       /https:\/\/.*\.lhr\.life$/
     ],

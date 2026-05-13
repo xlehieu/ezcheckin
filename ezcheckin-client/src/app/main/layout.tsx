@@ -10,7 +10,7 @@ export const metadata:Metadata={
     template:"%s | Dashboard"
   }
 }
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;

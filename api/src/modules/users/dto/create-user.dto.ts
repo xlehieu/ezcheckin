@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { RoleName } from '../schema/users.schema';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'Lê Xuân Hiếu' })
@@ -15,7 +16,16 @@ export class CreateUserDto {
   @MinLength(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
   password: string;
 
-  @ApiProperty()
-  @IsString()
-  roleId: string;
+  @ApiProperty({ example: 'NV00001' })
+  @IsOptional()
+  employeeCode: string;
+
+  @ApiProperty({
+    enum: RoleName,
+    example: RoleName.EMPLOYEE,
+  })
+  @IsEnum(RoleName, {
+    message: 'Role không hợp lệ',
+  })
+  role: RoleName;
 }
