@@ -11,14 +11,12 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # Chuyển tên repo thành chữ thường để không bị lỗi với Docker Registry
   IMAGE_NAME: ${{ github.repository }}/api
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
-    # Cấp quyền để GitHub Actions có thể đẩy Image lên Packages
     permissions:
       contents: read
       packages: write
@@ -61,7 +59,6 @@ jobs:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         env:
-          # Đưa các biến từ GitHub Actions vào môi trường của SSH
           REGISTRY: ${{ env.REGISTRY }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           IMAGE_TAG: ${{ github.sha }}
@@ -72,36 +69,31 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           envs: REGISTRY,IMAGE_NAME,IMAGE_TAG,GITHUB_TOKEN,GITHUB_ACTOR
-          # Chạy lệnh trực tiếp trên VPS
           script: |
             echo "Starting deployment..."
             
-            # Đảm bảo tên image luôn viết thường (quy tắc của Docker)
             LOWERCASE_IMAGE_NAME=$(echo "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')
             REGISTRY_URL="$REGISTRY/$LOWERCASE_IMAGE_NAME"
             
-            # Login vào GitHub Container Registry trên VPS
             echo "$GITHUB_TOKEN" | docker login $REGISTRY -u $GITHUB_ACTOR --password-stdin
             
-            # Pull image mới nhất về
             docker pull $REGISTRY_URL:$IMAGE_TAG
             
-            # Xóa container cũ nếu đang chạy
             docker stop ezcheckin-api || true
             docker rm ezcheckin-api || true
             
-            # Khởi chạy container mới
+            # Khởi chạy container mới với việc mount file env vào thẳng ruột app
             docker run -d \
               --name ezcheckin-api \
               --restart unless-stopped \
               -p 3000:3000 \
               --env-file ~/.env_ezcheckin \
+              -v ~/.env_ezcheckin:/app/.env \
               -v ezcheckin-api-logs:/app/logs \
               $REGISTRY_URL:$IMAGE_TAG
             
             echo "Deployment completed successfully!"
             
-            # Check sức khỏe app sau 5 giây
             sleep 5
             if docker ps | grep ezcheckin-api > /dev/null; then
               echo "✅ Container is running!"
