@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./nodejs 
+        working-directory: ./api 
     strategy:
       matrix:
         node-version: [20.x] # Thường chỉ cần bản ổn định nhất để tiết kiệm thời gian,  18.x, 16.x, 14.x, 12.x, 10.x
