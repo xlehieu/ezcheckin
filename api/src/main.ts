@@ -7,9 +7,9 @@ import chalk from 'chalk';
 import { AppModule } from './app.module';
 
 import * as dotenv from 'dotenv';
-dotenv.config({
-  path: '.env',
-});
+// dotenv.config({
+//   path: '.env',
+// });
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(

@@ -4,18 +4,11 @@ services:
   mongo-tx:
     image: mongo:7.0
     container_name: local_mongo_tx
-    # Bên trong container vẫn chạy 27017
     command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
     ports:
-      - '27018:27017' # Ánh xạ cổng 27018 của máy tính vào 27017 của Docker
+      - '27018:27017'
     volumes:
       - local_mongo_data:/data/db
-    healthcheck:
-      test: mongosh --port 27017 --quiet --eval "try { rs.initiate({_id:'rs0',members:[{_id:0,host:'127.0.0.1:27017'}]}) } catch(e) { rs.status().ok }"
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
   redis:
     image: redis:7-alpine
@@ -25,12 +18,23 @@ services:
     volumes:
       - local_redis_data:/data
     command: redis-server --appendonly yes
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
+
+  # api:
+  #   build: .
+  #   container_name: ez_api
+  #   restart: always
+  #   depends_on:
+  #     - mongo-tx
+  #     - redis
+  #   ports:
+  #     - '3000:3000'
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     MONGODB_URI: mongodb://mongo-tx:27017/ezcheckin_local?replicaSet=rs0&directConnection=true
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     REDIS_URL: redis://redis:6379
 
 volumes:
   local_mongo_data:

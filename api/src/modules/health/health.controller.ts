@@ -1,4 +1,5 @@
 // src/modules/health/health.controller.ts
+import { Public } from '@/decorator/public.decorator';
 import { Controller, Get } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import {
@@ -8,8 +9,8 @@ import {
   HealthCheck,
 } from '@nestjs/terminus';
 
+@Public()
 @Controller('health')
-@ApiBearerAuth()
 export class HealthController {
   constructor(
     private health: HealthCheckService,
