@@ -100,4 +100,7 @@ jobs:
               -e JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" \
               -e EXPIRED_ACCESS_TOKEN="1d" \
               -e CLIENT_ORIGIN="${{ secrets.CLIENT_ORIGIN }}" \
+              -e REDIS_HOST=redis \
+              -e REDIS_PORT=6379 \
+              -e REDIS_URL=redis://redis:6379 \
               ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:latest
