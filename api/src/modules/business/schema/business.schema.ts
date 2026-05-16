@@ -47,7 +47,9 @@ export class Business {
   //     ],
   //   ],
   // };
-
+  @Prop({ type: Number, default: 0 })
+  maxAttendanceDistance?: number;
+  
   @Prop({ type: Number, default: 0 })
   earlyCheckinMinutes?: number;
 

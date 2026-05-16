@@ -4,7 +4,9 @@ import { APIResponse } from "@/@types/response.type";
 import { apiServer } from "@/lib/apiServer";
 
 export async function login(loginPayload:LoginPayload){
-    return await apiServer.post<APIResponse<LoginResponse>>("/auth/login",loginPayload)
+    return await apiServer.post<APIResponse<LoginResponse>>("/auth/login",loginPayload,{
+        passError:true
+    })
     // console.log("resLogin",resLogin)
     // if(resLogin.data){
     //     redirect(MAIN_ROUTE.MAIN)

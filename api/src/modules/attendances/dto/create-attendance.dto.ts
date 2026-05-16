@@ -1,20 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsMongoId,
-  IsOptional,
-  IsArray,
-  ArrayMinSize,
   ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsMongoId,
   IsNumber,
-  IsString,
+  IsOptional
 } from 'class-validator';
-
 export class CreateAttendanceDto {
   @ApiProperty({
     description: 'object id',
     required: false,
   })
-  @IsString({message:"ShiftId phải là chuỗi"})
+  @IsMongoId({
+  message: 'shiftId không đúng định dạng MongoId',
+})
   shiftId:string
   
   @ApiProperty({

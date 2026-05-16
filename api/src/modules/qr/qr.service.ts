@@ -1,7 +1,11 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import { QRGenerateResponse, QRTokenPayload } from '@/@types/qr.type';
 import { RedisService } from '@/shared/redis/redis.service';
-import { QRTokenPayload, QRGenerateResponse, QRVerifyResponse } from '@/@types/qr.type';
-import * as qrcode from 'qrcode';
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { randomBytes } from 'crypto';
 
 @Injectable()
@@ -17,7 +21,10 @@ export class QrService {
    * @param userId - ID của user
    * @returns QRGenerateResponse with token, qrCode image, and expiration info
    */
-  async generateQrToken(businessId: string,shiftId:string): Promise<QRGenerateResponse> {
+  async generateQrToken(
+    businessId: string,
+    shiftId: string,
+  ): Promise<QRGenerateResponse> {
     try {
       // Generate unique token
       const token = randomBytes(32).toString('hex');
@@ -32,30 +39,31 @@ export class QrService {
       };
 
       // Store in Redis with TTL
-      await this.redisService.set(
-        redisKey,
-        payload,
-        this.QR_TTL_SECONDS,
+      await this.redisService.set(redisKey, payload, this.QR_TTL_SECONDS);
+
+      //   // Generate QR code image (Base64)
+      //   const qrCode = await qrcode.toDataURL(token, {
+      //     errorCorrectionLevel: 'H',
+      //     type: 'image/png',
+      //     quality: 0.95,
+      //     margin: 1,
+      //     width: 300,
+      //   });
+
+      // const expiresAt = Date.now() + this.QR_TTL_SECONDS * 1000;
+
+      this.logger.log(
+        `QR token generated for businessId ${businessId} and shiftId ${shiftId}`,
       );
 
-    //   // Generate QR code image (Base64)
-    //   const qrCode = await qrcode.toDataURL(token, {
-    //     errorCorrectionLevel: 'H',
-    //     type: 'image/png',
-    //     quality: 0.95,
-    //     margin: 1,
-    //     width: 300,
-    //   });
-
-      const expiresAt = Date.now() + this.QR_TTL_SECONDS * 1000;
-
-      this.logger.log(`QR token generated for businessId ${businessId} and shiftId ${shiftId}`);
-
       return {
-        token
+        token,
       };
     } catch (error) {
-      this.logger.error(`Error generate for businessId ${businessId} and shiftId ${shiftId}`, error);
+      this.logger.error(
+        `Error generate for businessId ${businessId} and shiftId ${shiftId}`,
+        error,
+      );
       throw new BadRequestException('Failed to generate QR token');
     }
   }
@@ -65,30 +73,23 @@ export class QrService {
    * @param token - Token từ QR code
    * @returns QRVerifyResponse with validity and user info
    */
-  async verifyQrToken(token: string,userId:string): Promise<QRVerifyResponse> {
-    try {
-      const redisKey = `${this.QR_KEY_PREFIX}${token}`;
+  async verifyQrToken(token: string) {
+    const redisKey = `${this.QR_KEY_PREFIX}${token}`;
 
-      // Get token from Redis
-      const payload = await this.redisService.get<QRTokenPayload>(redisKey);
+    // Get token from Redis
+    const payload = await this.redisService.get<QRTokenPayload>(redisKey);
 
-      if (!payload) {
-        return {
-          valid: false,
-          message: 'QR token không tồn tại hoặc đã hết hạn',
-        };
-      }
-
-      await this.redisService.delete(redisKey);
-
-      return {
-        valid: true,
-        message: 'QR token hợp lệ',
-      };
-    } catch (error) {
-      this.logger.error(`Error verifying QR token:`, error);
-      throw new BadRequestException('Failed to verify QR token');
+    if (!payload) {
+      throw new BadGatewayException('QR token không tồn tại hoặc đã hết hạn');
     }
+
+    await this.redisService.delete(redisKey);
+
+    return {
+      valid: true,
+      payload,
+      message: 'QR token hợp lệ',
+    };
   }
 
   /**

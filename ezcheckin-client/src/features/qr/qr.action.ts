@@ -1,14 +1,11 @@
 "use server";
 
 import { OptionsFetch } from "@/@types/common";
-import { APIPaginationResponse, APIResponse } from "@/@types/response.type";
-import {
-  ShiftRecord
-} from "@/@types/shift.type";
+import { QRGenerate, QRVerifyAttendancePayload, QRVerifyResponse } from "@/@types/qr.type";
+import { APIResponse } from "@/@types/response.type";
 import { apiServer } from "@/lib/apiServer";
 import { revalidateServerAction } from "@/lib/revalidateTagSA";
 import { QR_DURATION, QR_TAG } from "./qr.tag";
-import { QRGenerate, QRVerifyResponse } from "@/@types/qr.type";
 
 export async function generateQR(shiftId:string,options?:OptionsFetch) {
   if(options?.hasRevalidate){
@@ -22,9 +19,7 @@ export async function generateQR(shiftId:string,options?:OptionsFetch) {
   return res.data.token
 }
 
-export async function verifyQR(token: string) {
-  const res = await apiServer.post<APIResponse<QRVerifyResponse>>(`/qr/verify`, {
-    token,
-  });
+export async function verifyQR(payload:QRVerifyAttendancePayload) {
+  const res = await apiServer.post<APIResponse<QRVerifyResponse>>(`/qr/verify/checkin-checkout`, payload);
   return res.data;
 }

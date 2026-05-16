@@ -1,10 +1,14 @@
-import { Module } from '@nestjs/common';
-import { QrService } from './qr.service';
-import { QrController } from './qr.controller';
 import { RedisModule } from '@/shared/redis/redis.module';
+import { Module } from '@nestjs/common';
+import { AttendancesModule } from '../attendances/attendances.module';
+import { QrController } from './qr.controller';
+import { QrService } from './qr.service';
 
 @Module({
-  imports: [RedisModule],
+  imports: [
+    RedisModule,
+    AttendancesModule,
+  ],
   controllers: [QrController],
   providers: [QrService],
   exports: [QrService],

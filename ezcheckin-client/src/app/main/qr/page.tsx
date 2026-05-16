@@ -1,11 +1,9 @@
 "use client";
 import { OptionsFetch } from "@/@types/common";
-import { ShiftRecord } from "@/@types/shift.type";
 import { generateQR } from "@/features/qr/qr.action";
-import { getShifts } from "@/features/shifts/shift.action";
+import { useShifts } from "@/features/shifts/useShift";
 import { useApp } from "@/hooks/useApp";
-import { usePaginationData } from "@/hooks/useDataPagination";
-import { Button, Card, Select, Typography, Space, Divider } from "antd";
+import { Button, Card, Divider, Select, Space, Typography } from "antd";
 import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 
@@ -14,21 +12,13 @@ const { Title, Text } = Typography;
 export default function QRCheckinPage() {
   const [token, setToken] = useState<string | null>(null);
   const [shiftId, setShiftId] = useState<string | null>(null);
-  const {
-    data: shiftList,
-    setData,
-    setLoading,
-    loading,
-    setTotal,
-    total,
-  } = usePaginationData<ShiftRecord>();
+  const { data: shiftList } = useShifts();
   const qrValue = token
     ? `${process.env.NEXT_PUBLIC_APP_URL}/main/qr/verify?token=${token}`
     : null;
   const { notify } = useApp();
   const getToken = async (options?: OptionsFetch) => {
     try {
-      setLoading(true);
       if (shiftId) {
         const token = await generateQR(shiftId, options);
         setToken(token);
@@ -36,27 +26,12 @@ export default function QRCheckinPage() {
     } catch (error) {
       notify.error("Lỗi khi tải danh sách ca làm việc");
     } finally {
-      setLoading(false);
     }
   };
-  const fetchShifts = async (options?: OptionsFetch) => {
-    try {
-      setLoading(true);
-      const res = await getShifts();
-      setData(res.data);
-      setTotal(res.meta.total);
-    } catch (error) {
-      notify.error("Lỗi khi tải danh sách ca làm việc");
-    } finally {
-      setLoading(false);
-    }
-  };
+
   useEffect(() => {
     getToken();
   }, [shiftId]);
-  useEffect(() => {
-    fetchShifts();
-  }, []);
   return (
     <div className="flex items-center justify-center">
       <Card

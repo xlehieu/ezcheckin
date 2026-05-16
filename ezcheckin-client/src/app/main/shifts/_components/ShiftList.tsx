@@ -1,89 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button, Table, Tag, Input, Space, Popconfirm, message } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { useState } from "react";
+import { Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 
-import {
-  getShifts,
-  createShift,
-  updateShift,
-  deleteShift,
-} from "@/features/shifts/shift.action";
-import { ShiftRecord, CreateShiftPayload } from "@/@types/shift.type";
-import { usePaginationData } from "@/hooks/useDataPagination";
-import { useShiftStore } from "@/store/shift.store";
-import { useShallow } from "zustand/react/shallow";
-import { OptionsFetch } from "@/@types/common";
+import { ShiftRecord } from "@/@types/shift.type";
 import ShiftModal from "./ShiftModal";
 import TableAction from "@/components/ui/TableAction";
 import ShiftFilter from "./ShiftFilter";
 import { useApp } from "@/hooks/useApp";
+import { useShifts } from "@/features/shifts/useShift";
 
 const timeToHHmm = (time: string) => time.substring(0, 5);
 
 export default function ShiftList() {
-  const {notify}=useApp()
-  const { shiftListFilter, setShiftListFilter } = useShiftStore(
-    useShallow((state) => ({
-      shiftListFilter: state.shiftListFilter,
-      setShiftListFilter: state.setShiftListFilter,
-    })),
-  );
+  const { notify } = useApp();
 
-  const { data, setData, setLoading, loading, setTotal, total } =
-    usePaginationData<ShiftRecord>();
+  const {
+    data,
+    loading,
+    total,
+    shiftListFilter,
+    reload,
+    changePagination,
+  } = useShifts(notify);
 
   const [shiftDetail, setShiftDetail] = useState<ShiftRecord | null>(null);
 
-  const fetchShifts = async (options?: OptionsFetch) => {
-    try {
-      setLoading(true);
-      const res = await getShifts(shiftListFilter, options);
-      setData(res.data);
-      setTotal(res.meta.total);
-    } catch (error) {
-      notify.error("Lỗi khi tải danh sách ca làm việc");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchShifts();
-  }, [shiftListFilter]);
-
   const handleOpenModal = (shift?: ShiftRecord) => {
-    if (shift) {
-      setShiftDetail(shift);
-    } else {
-      setShiftDetail({} as ShiftRecord); // ← Empty object để mở modal create
-    }
+    setShiftDetail(shift ?? ({} as ShiftRecord));
   };
 
   const handleCloseModal = () => {
     setShiftDetail(null);
-  };
-
-  const handleSubmitSuccess = async () => {
-    handleCloseModal();
-    await fetchShifts({ hasRevalidate: true });
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteShift(id);
-      notify.success("Xóa ca làm việc thành công");
-      fetchShifts({hasRevalidate:true});
-    } catch (error: any) {
-      notify.error(error?.message || "Có lỗi xảy ra");
-    }
   };
 
   const columns: ColumnsType<ShiftRecord> = [
@@ -118,7 +67,8 @@ export default function ShiftList() {
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (value: string) => new Date(value).toLocaleDateString("vi-VN"),
+      render: (value: string) =>
+        new Date(value).toLocaleDateString("vi-VN"),
     },
     {
       title: "Hành động",
@@ -127,10 +77,10 @@ export default function ShiftList() {
       render: (_, record: ShiftRecord) => (
         <TableAction
           record={record}
-          onClickEdit={(value) => {
-            setShiftDetail(value)
+          onClickEdit={(value) => setShiftDetail(value)}
+          onConfirmDelete={() => {
+            // nếu bạn muốn delete thì add lại vào hook hoặc gọi API riêng
           }}
-          onConfirmDelete={(value) => handleDelete(value._id)}
         />
       ),
     },
@@ -138,7 +88,10 @@ export default function ShiftList() {
 
   return (
     <>
-      <ShiftFilter handleReload={()=>fetchShifts({hasRevalidate:true})} handleOpenModal={handleOpenModal}/>
+      <ShiftFilter
+        handleReload={reload}
+        handleOpenModal={handleOpenModal}
+      />
 
       <Table<ShiftRecord>
         rowKey="_id"
@@ -149,21 +102,14 @@ export default function ShiftList() {
           current: shiftListFilter.current || 1,
           pageSize: shiftListFilter.pageSize || 10,
           total,
-          onChange: (page, pageSize) => {
-            setShiftListFilter({
-              ...shiftListFilter,
-              current: page,
-              pageSize: pageSize,
-            });
-          },
+          onChange: changePagination,
         }}
       />
 
-      {/* ✅ Modal tách riêng */}
       <ShiftModal
         shiftDetail={shiftDetail}
         onClose={handleCloseModal}
-        onSubmitSuccess={handleSubmitSuccess}
+        onSubmitSuccess={reload}
       />
     </>
   );

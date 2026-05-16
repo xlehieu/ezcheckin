@@ -1,132 +1,88 @@
-"use client"
+'use client';
 
-import { useForm } from "@tanstack/react-form"
-import * as z from "zod"
+import { useState } from 'react';
+import { Form, Input, Button, Spin } from 'antd';
+import { EyeInvisibleOutlined, EyeOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import { login } from '@/features/auth/auth.action';
+import { useApp } from '@/hooks/useApp';
+import { ROUTE_MAIN } from '@/routes/main/main.route';
 
-import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { login } from "@/features/auth/auth.action"
-import { ROUTE_MAIN } from "@/routes/main/main.route"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-
-export const formSchema = z.object({
-  email: z.email("Không đúng định dạng email"),
-  password: z
-    .string()
-    .min(6, "Mật khẩu tối thiểu 6 ký tự")
-    .max(100, "Mật khẩu tối đa 100 ký tự"),
-});
+interface LoginFormValues {
+  email: string;
+  password: string;
+}
 
 export function LoginForm() {
-  const router= useRouter()
-  // const {mutateAsync:login}=useLogin()
-  const formTanstack = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-    validators: {
-      onSubmit: formSchema,
-    },
-    onSubmit: async ({ value }) => {
-      // await login(value)
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const { notify } = useApp();
+  const router = useRouter();
 
-      const data = await login(value)
-      if(data.data){
-        toast.success("Đăng nhập thành công")
-        router.replace(ROUTE_MAIN.MAIN)
+  const onFinish = async (values: LoginFormValues) => {
+    try {
+      setLoading(true);
+      const data = await login(values);
+      
+      if (data?.data) {
+        notify?.success?.('Đăng nhập thành công');
+        router.replace(ROUTE_MAIN.MAIN);
+        //để loading ở đây để đợi nó load cho đến khi chuyển trang
+        setLoading(false);
+      } else {
+        notify?.error?.(data?.message || 'Đăng nhập thất bại');
       }
-      // await signIn("credentials",{
-      //   ...value,
-      //   redirect:false
-      // })
-      // const resLogin = await authenticate(value.email,value.password )
-      // console.log(resLogin)
-      // if(resLogin.error){
-      //   toast.error(resLogin.error)
-      // }
-    },
-  })
+    } catch (error: any) {
+      notify?.error?.(error?.message || 'Có lỗi xảy ra');
+      setLoading(false);
+    }
+  };
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-        formTanstack.handleSubmit()
-      }}
-    >
-      <FieldGroup className="space-y-4">
-        <formTanstack.Field
+    <Spin spinning={loading}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        autoComplete="off"
+      >
+        <Form.Item
           name="email"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="name@example.com"
-                  autoComplete="email"
-                  className="border-primary/20 focus:border-primary/50 focus:ring-primary/30"
-                />
-                {isInvalid && (
-                  <FieldError errors={field.state.meta.errors}/>
-                )}
-              </Field>
-            )
-          }}
-        />
-
-        <formTanstack.Field
-          name="password"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className="border-primary/20 focus:border-primary/50 focus:ring-primary/30"
-                />
-                {isInvalid && (
-                  <FieldError errors={field.state.meta.errors} />
-                )}
-              </Field>
-            )
-          }}
-        />
-
-        <Button 
-        variant={"glow"}
-          type="submit" 
-          className="glow-button w-full mt-6"
+          rules={[
+            { required: true, message: 'Nhập email' },
+            { type: 'email', message: 'Email không hợp lệ' },
+          ]}
         >
-          Sign in
-        </Button>
-      </FieldGroup>
-    </form>
-  )
+          <Input
+            prefix={<MailOutlined />}
+            placeholder="Email"
+            size="large"
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          rules={[
+            { required: true, message: 'Nhập mật khẩu' },
+            { min: 6, message: 'Tối thiểu 6 ký tự' },
+          ]}
+        >
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="Mật khẩu"
+            size="large"
+            iconRender={(visible) =>
+              visible ? <EyeOutlined /> : <EyeInvisibleOutlined />
+            }
+          />
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block size="large" loading={loading}>
+            Đăng Nhập
+          </Button>
+        </Form.Item>
+      </Form>
+    </Spin>
+  );
 }

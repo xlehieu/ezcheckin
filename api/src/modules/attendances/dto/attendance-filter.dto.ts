@@ -1,6 +1,17 @@
+import { IsDateString, IsNotEmpty, IsOptional } from "class-validator";
+
 export class GetAttendanceFilterDto {
+  @IsOptional()
   shiftId?: string;
+
+  @IsOptional()
   userId?: string;
-  fromDate?: string; // YYYY-MM-DD
-  toDate?: string;   // YYYY-MM-DD
+
+  @IsNotEmpty()
+  @IsDateString()
+  fromDate: string;
+
+  @IsNotEmpty()
+  @IsDateString()
+  toDate: string;
 }

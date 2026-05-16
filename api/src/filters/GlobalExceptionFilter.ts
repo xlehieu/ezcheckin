@@ -10,9 +10,8 @@ import {
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-
+    
     const response = ctx.getResponse();
-
     // console.log("exception", exception);
 
     // Mongo duplicate key
@@ -27,14 +26,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       });
     }
 
-    // Nest HttpException
-    if (exception instanceof HttpException) {
+     if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      const message = 
+        typeof exceptionResponse === 'object' && 'message' in exceptionResponse
+          ? exceptionResponse.message  // Lấy message custom từ exception
+          : exception.message;
+
       return response.status(exception.getStatus()).send({
         statusCode: exception.getStatus(),
-        message: exception.message,
+        message: message,  // ← Giờ sẽ là "Thông tin đăng nhập không chính xác"
       });
     }
-
     return response.status(500).send({
       statusCode: 500,
       message: "Internal server error",

@@ -93,8 +93,7 @@ export class BusinessService {
     }
 
     const data = { ...dto };
-    const dataJ = await this.businessModel.findOne({_id:id})
-    this.logger.log("dataJ",dataJ)
+    // const dataJ = await this.businessModel.findOne({_id:id})
     const updated = await this.businessModel.findOneAndUpdate(
       {
         _id: id,

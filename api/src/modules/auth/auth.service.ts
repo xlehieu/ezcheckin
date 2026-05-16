@@ -195,7 +195,7 @@ export class AuthService {
           path: 'license',
         },
       });
-    // this.logger.debug(user);
+    this.logger.debug(user);
     if (!user)
       throw new UnauthorizedException('Thông tin đăng nhập không chính xác');
     const systemConfig = await this.systemConfigModel.findOne().lean();
@@ -216,7 +216,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
     if (!isPasswordValid)
       throw new UnauthorizedException('Thông tin đăng nhập không chính xác');
-
+    console.log(user)
     return {
       sub: user._id?.toString(),
       email: user.email,

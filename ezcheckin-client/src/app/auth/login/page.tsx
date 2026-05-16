@@ -2,13 +2,14 @@ import Link from "next/link";
 import { LoginForm } from "./LoginForm";
 import { AUTH_ROUTES } from "@/routes/auth/auth.route";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata:Metadata={
   title:{
     absolute:"Đăng nhập"
   }
 }
-export default function LoginPage() {
+const LoginPage=()=> {
   return (
     <div className="min-h-screen flex items-center justify-center gradient-bg">
       <div className="w-full max-w-md glass-card-hover p-8">
@@ -21,7 +22,7 @@ export default function LoginPage() {
           </p> */}
         </div>
 
-        <LoginForm />
+        <Suspense fallback={<div></div>}><LoginForm /></Suspense>
 
         <div className="text-center mt-6 text-sm">
           <span className="text-muted-foreground">Bạn chưa có tài khoản? </span>
@@ -36,3 +37,4 @@ export default function LoginPage() {
     </div>
   );
 }
+export default LoginPage

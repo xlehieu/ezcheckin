@@ -14,6 +14,7 @@ import { Shift, ShiftDocument } from '../shifts/schema/shift.schema';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import {
   Attendance,
+  AttendanceCheckinStatus,
   AttendanceCheckoutStatus,
   AttendanceDocument,
 } from './schema/attendance.schema';
@@ -36,7 +37,9 @@ export class AttendancesService {
   ) {}
   async findAllByBusiness(businessId: string, filters: GetAttendanceFilterDto) {
     const { shiftId, userId, fromDate, toDate } = filters;
-    const query: QueryFilter<Attendance> = { business: new Types.ObjectId(businessId) };
+    const query: QueryFilter<Attendance> = {
+      business: new Types.ObjectId(businessId),
+    };
     if (shiftId) {
       query.shift = new Types.ObjectId(shiftId);
     }
@@ -54,8 +57,8 @@ export class AttendancesService {
     }
     const data = await this.attendanceModel
       .find(query)
-      .populate<{user:UserDocument}>('user', 'fullName employeeCode email') // Chỉ lấy các field cần thiết của User
-      .populate<{user:ShiftDocument}>('shift', 'name startTime endTime') // Lấy thông tin ca
+      .populate<{ user: UserDocument }>('user', 'fullName employeeCode email') // Chỉ lấy các field cần thiết của User
+      .populate<{ user: ShiftDocument }>('shift', 'name startTime endTime') // Lấy thông tin ca
       .sort({ workDate: -1, checkinTime: -1 }) // Mới nhất lên đầu
       .lean();
 
@@ -82,10 +85,22 @@ export class AttendancesService {
           _id: null,
           total: { $sum: 1 },
           lateCheckin: {
-            $sum: { $cond: [{ $eq: ['$statusCheckin', 'LATE'] }, 1, 0] },
+            $sum: {
+              $cond: [
+                { $eq: ['$statusCheckin', AttendanceCheckinStatus.LATE] },
+                1,
+                0,
+              ],
+            },
           },
           earlyCheckout: {
-            $sum: { $cond: [{ $eq: ['$statusCheckout', 'EARLY'] }, 1, 0] },
+            $sum: {
+              $cond: [
+                { $eq: ['$statusCheckout', AttendanceCheckoutStatus.EARLY] },
+                1,
+                0,
+              ],
+            },
           },
           present: {
             $sum: { $cond: [{ $ne: ['$checkinTime', null] }, 1, 0] },
@@ -169,7 +184,7 @@ export class AttendancesService {
         };
       }
 
-      status = now.isAfter(timeAllowLate) ? 'LATE' : 'ON_TIME';
+      status = now.isAfter(timeAllowLate) ? AttendanceCheckinStatus.LATE : AttendanceCheckinStatus.ON_TIME;
 
       const newAttendance = await this.attendanceModel.create({
         user: new Types.ObjectId(userId),
@@ -182,8 +197,10 @@ export class AttendancesService {
       });
 
       return {
-        message: status === 'LATE' ? 'Checkin muộn' : 'Checkin thành công',
-        data: newAttendance,
+        data: {
+          message: status === 'LATE' ? 'Checkin muộn' : 'Checkin thành công',
+          data: { data: newAttendance, type: 'CHECKIN' },
+        },
       };
     } catch (error: any) {
       // Kiểm tra mã lỗi 11000 của MongoDB
@@ -213,8 +230,10 @@ export class AttendancesService {
 
     if (now.isAfter(timeLimitLate)) {
       return {
-        type: 'LATE_LIMIT',
-        message: 'Đã hết giờ checkout, vui lòng liên hệ admin',
+        data: {
+          type: 'LATE_LIMIT',
+          message: 'Đã hết giờ checkout, vui lòng liên hệ admin',
+        },
       };
     }
 
@@ -239,7 +258,7 @@ export class AttendancesService {
         statusCheckout === AttendanceCheckoutStatus.EARLY
           ? 'Checkout sớm'
           : 'Checkout thành công',
-      data: updatedAttendance,
+      data: { data: updatedAttendance, type: 'CHECKOUT' },
     };
   }
 

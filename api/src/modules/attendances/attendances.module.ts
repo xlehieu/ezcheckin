@@ -13,9 +13,9 @@ import { Attendance, AttendanceSchema } from './schema/attendance.schema';
       { name: Business.name, schema: BusinessSchema },
       { name: Shift.name, schema: ShiftSchema },
     ]),
-    MongooseModule.forFeature([{ name: Shift.name, schema: ShiftSchema }]),
   ],
   controllers: [AttendancesController],
   providers: [AttendancesService],
+  exports:[AttendancesService]
 })
 export class AttendancesModule {}

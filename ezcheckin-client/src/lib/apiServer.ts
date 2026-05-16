@@ -91,6 +91,7 @@ export async function request<T>(
 
     if (!res.ok) {
       const errorData = await res.json();
+      console.log(errorData)
       throw new Error(errorData.message);
     }
   }

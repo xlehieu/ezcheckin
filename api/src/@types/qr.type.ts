@@ -9,8 +9,3 @@ export type QRGenerateResponse = {
   token: string;
 };
 
-export type QRVerifyResponse = {
-  valid: boolean;
-  userId?: string;
-  message: string;
-};

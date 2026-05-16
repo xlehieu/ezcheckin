@@ -30,6 +30,14 @@ export class CreateBusinessDto {
   location?: number[][];
 
   @ApiPropertyOptional({
+    example: 30,
+    description: 'Bán kính cho phép chấm công (tính theo mét)',
+  })
+  @IsOptional()
+  @IsNumber()
+  maxAttendanceDistance?: number;
+
+  @ApiPropertyOptional({
     example: 10,
     description: 'Số phút cho phép checkin sớm',
   })
